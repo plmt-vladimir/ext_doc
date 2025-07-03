@@ -1,0 +1,211 @@
+import Input from "@/components/UI/Input";
+import Textarea from "@/components/UI/Textarea";
+import FormField from "@/components/UI/FormField";
+import Button from "@/components/UI/Button";
+import GroupBox from "@/components/UI/Groupbox";
+import Select from "react-select";
+import { useEffect, useMemo } from "react";
+import { useAOSRCreate } from "./AOSRCreateContext";
+
+const normOptions = [
+  { label: "СП 70.13330.2012", value: "СП 70.13330.2012" },
+  { label: "ГОСТ 25100-2011", value: "ГОСТ 25100-2011" },
+  { label: "СНиП 3.03.01-87", value: "СНиП 3.03.01-87" },
+];
+
+// Формирование строки по ТЗ:
+function buildPresentation(data) {
+  let rowStr = [data.section, data.code, data.sheets].filter(Boolean).join(", ");
+  let lines = [];
+  if (rowStr) lines.push(rowStr);
+  if (data.fullName) lines.push(data.fullName);
+  if (data.org) lines.push([rowStr, data.org].filter(Boolean).join(", "));
+  return lines.join("\n");
+}
+
+// Сборка строки с СП (в начале)
+function buildPresentationWithNorms(data) {
+  const normsStr = (data.norms && data.norms.length)
+    ? data.norms.map(n => n.label).join("; ") + " "
+    : "";
+  const pres = buildPresentation(data);
+  return normsStr + pres;
+}
+
+export default function AOSRNormTab() {
+  const { norm, setNorm } = useAOSRCreate();
+  const { main, aux } = norm;
+
+  // Автоформирование представления для main/aux при их изменении
+  useEffect(() => {
+    setNorm((prev) => ({
+      ...prev,
+      main: {
+        ...prev.main,
+        presentation: buildPresentation(prev.main),
+        presentationWithNorms: buildPresentationWithNorms(prev.main)
+      }
+    }));
+  }, [main.section, main.code, main.sheets, main.fullName, main.org, main.norms, setNorm]);
+
+  useEffect(() => {
+    setNorm((prev) => ({
+      ...prev,
+      aux: {
+        ...prev.aux,
+        presentation: buildPresentation(prev.aux),
+        presentationWithNorms: buildPresentationWithNorms(prev.aux)
+      }
+    }));
+  }, [aux.section, aux.code, aux.sheets, aux.fullName, aux.org, aux.norms, setNorm]);
+
+  // Общие textarea внизу — суммы представлений
+  const combinedPresentation = useMemo(() =>
+    [norm.main.presentation, norm.aux.presentation].filter(Boolean).join("\n\n"), [norm]
+  );
+  const combinedPresentationWithNorms = useMemo(() =>
+    [norm.main.presentationWithNorms, norm.aux.presentationWithNorms].filter(Boolean).join("\n\n"), [norm]
+  );
+
+  // Очищение всей формы
+  const handleClear = () => {
+    setNorm({
+      main: {
+        section: "",
+        code: "",
+        sheets: "",
+        fullName: "",
+        org: "",
+        norms: [],
+        exec: false,
+        presentation: "",
+        presentationWithNorms: "",
+      },
+      aux: {
+        section: "",
+        code: "",
+        sheets: "",
+        fullName: "",
+        org: "",
+        norms: [],
+        exec: false,
+        presentation: "",
+        presentationWithNorms: "",
+      }
+    });
+  };
+
+  // Отрисовка одного раздела
+  const renderDocSection = (title, data, sectionKey) => (
+    <GroupBox bordered className="w-full">
+      <h4 className="group-box-title mb-2">{title}</h4>
+      <div className="grid grid-cols-3 gap-4 mb-2">
+        <Input
+          placeholder="Раздел проекта"
+          value={data.section}
+          onChange={e => setNorm(prev => ({
+            ...prev,
+            [sectionKey]: { ...prev[sectionKey], section: e.target.value }
+          }))}
+        />
+        <Input
+          placeholder="Шифр раздела"
+          value={data.code}
+          onChange={e => setNorm(prev => ({
+            ...prev,
+            [sectionKey]: { ...prev[sectionKey], code: e.target.value }
+          }))}
+        />
+        <Input
+          placeholder="Листы"
+          value={data.sheets}
+          onChange={e => setNorm(prev => ({
+            ...prev,
+            [sectionKey]: { ...prev[sectionKey], sheets: e.target.value }
+          }))}
+        />
+      </div>
+      <Textarea
+        placeholder="Полное название"
+        value={data.fullName}
+        onChange={e => setNorm(prev => ({
+          ...prev,
+          [sectionKey]: { ...prev[sectionKey], fullName: e.target.value }
+        }))}
+        className="mb-2"
+      />
+      <Input
+        placeholder="Проектная организация"
+        value={data.org}
+        onChange={e => setNorm(prev => ({
+          ...prev,
+          [sectionKey]: { ...prev[sectionKey], org: e.target.value }
+        }))}
+        className="mb-2"
+      />
+      <Textarea
+        placeholder="Представление в документе"
+        value={data.presentation}
+        readOnly
+        className="mb-2"
+      />
+      <div className="flex gap-2 items-center mb-2">
+        <Select
+          options={normOptions}
+          isMulti
+          placeholder="Нормативные документы и СП"
+          value={data.norms}
+          onChange={v => setNorm(prev => ({
+            ...prev,
+            [sectionKey]: { ...prev[sectionKey], norms: v }
+          }))}
+          className="text-sm text-black w-full"
+          classNamePrefix="react-select"
+        />
+        <FormField
+          type="checkbox"
+          label="Исполнительный реестр"
+          checked={data.exec}
+          onChange={e => setNorm(prev => ({
+            ...prev,
+            [sectionKey]: { ...prev[sectionKey], exec: e.target.checked }
+          }))}
+        />
+      </div>
+      <Textarea
+        placeholder="Представление в документе с указанием СП"
+        value={data.presentationWithNorms}
+        readOnly
+      />
+    </GroupBox>
+  );
+
+  return (
+    <div className="flex flex-col gap-6">
+      <div className="grid grid-cols-2 gap-4">
+        {renderDocSection("Основной раздел проекта", norm.main, "main")}
+        {renderDocSection("Вспомогательный раздел проекта", norm.aux, "aux")}
+      </div>
+
+      <Textarea
+        placeholder="Представление в документе"
+        className="h-24"
+        value={combinedPresentation}
+        readOnly
+      />
+      <Textarea
+        placeholder="Представление в документе с указанием СП"
+        className="h-24"
+        value={combinedPresentationWithNorms}
+        readOnly
+      />
+
+      <div className="flex justify-end gap-4">
+        <Button onClick={handleClear}>Очистить</Button>
+        <Button>Применить</Button>
+      </div>
+    </div>
+  );
+}
+
+

@@ -1,0 +1,27 @@
+from pydantic import BaseModel
+
+class QualityDocTypeOut(BaseModel):
+    id: int
+    code: str
+    label: str
+
+    class Config:
+        from_attributes = True
+
+class ActStatusOut(BaseModel):
+    id: int
+    code: str
+    label: str
+    order: int
+
+    class Config:
+        from_attributes = True
+        
+class QualityDocTypeIn(BaseModel):
+    code: str
+    label: str
+
+class ActStatusIn(BaseModel):
+    code: str
+    label: str
+    order: int = 0
