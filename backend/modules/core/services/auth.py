@@ -9,9 +9,9 @@ from modules.core.models.user import User
 from modules.core.schemas.auth import TokenData
 
 # Ключи и настройки для JWT
-SECRET_KEY = "your-secret-key"  # желательно заменить на .env
+SECRET_KEY = "your-secret-key"  
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24  # 24 часа
+ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24  
 
 # Контекст для хэширования паролей
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
