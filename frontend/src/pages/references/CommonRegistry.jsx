@@ -12,6 +12,9 @@ export default function CommonRegistry() {
   const [workRegistry, setWorkRegistry] = useState([]);
   const [projectSections, setProjectSections] = useState([]);
 
+  const [initialWorkRegistry, setInitialWorkRegistry] = useState([]);
+  const [initialProjectSections, setInitialProjectSections] = useState([]);
+
   const [objects, setObjects] = useState([]);
   const [sites, setSites] = useState([]);
 
@@ -39,71 +42,78 @@ export default function CommonRegistry() {
       setProject(null);
       setProjectSections([]);
       setWorkRegistry([]);
+      setInitialWorkRegistry([]);
+      setInitialProjectSections([]);
     }
   }, [construction]);
 
   useEffect(() => {
     if (object?.value) {
-      // === 1. Загружаем work registry ===
-      api
-        .get(`/dictionaries/work-registry`, {
-          params: { object_id: object.value },
-        })
-        .then((res) => setWorkRegistry(res.data))
-        .catch((err) => {
-          console.error("Ошибка при загрузке work-registry", err);
-          setWorkRegistry([]);
-        });
+      api.get(`/dictionaries/work-registry`, {
+        params: { object_id: object.value },
+      }).then((res) => {
+        setWorkRegistry(res.data);
+        setInitialWorkRegistry(res.data);
+      });
 
-      // === 2. Загружаем проект и разделы ===
       api.get(`/projects/by-object/${object.value}`).then(async (res) => {
         let loadedProject = res.data.project;
         let sections = res.data.sections;
 
-        // === если проекта нет — создаём ===
         if (!loadedProject) {
-          try {
-            const newProjectResp = await api.post("/projects", {
-              object_id: object.value,
-              name: "Новый проект"
-            });
-            loadedProject = newProjectResp.data;
-            sections = [];
-          } catch (err) {
-            console.error("Ошибка при создании проекта", err);
-          }
+          const newProjectResp = await api.post("/projects", {
+            object_id: object.value,
+            name: "Новый проект"
+          });
+          loadedProject = newProjectResp.data;
+          sections = [];
         }
 
         setProject(loadedProject);
         setProjectSections(sections);
-      }).catch((err) => {
-        console.error("Ошибка при загрузке project-sections", err);
+        setInitialProjectSections(sections);
+      }).catch(() => {
         setProject(null);
         setProjectSections([]);
+        setInitialProjectSections([]);
       });
     }
   }, [object]);
 
   const handleSaveAll = async () => {
     try {
-      // === Сохраняем workRegistry ===
+      // Удаляем workRegistry
+      const deletedWorks = initialWorkRegistry.filter(
+        oldRow => !workRegistry.some(row => row.id === oldRow.id)
+      );
+      for (const row of deletedWorks) {
+        await api.delete(`/dictionaries/work-registry/${row.id}`);
+      }
+
+      // Удаляем projectSections
+      const deletedSections = initialProjectSections.filter(
+        oldRow => !projectSections.some(row => row.id === oldRow.id)
+      );
+      for (const row of deletedSections) {
+        await api.delete(`/projects/sections/${row.id}`);
+      }
+
+      // Сохраняем workRegistry
       for (const row of workRegistry) {
         if (!row.code || !row.title) continue;
-
         if (row.id) {
-          await api.put(`/api/dictionaries/work-registry/${row.id}`, row);
+          await api.put(`/dictionaries/work-registry/${row.id}`, row);
         } else {
-          await api.post(`/api/dictionaries/work-registry`, {
+          await api.post(`/dictionaries/work-registry`, {
             ...row,
             object_id: object.value,
           });
         }
       }
 
-      // === Сохраняем projectSections ===
+      // Сохраняем projectSections
       for (const row of projectSections) {
         if (!row.section_code || !row.section_name) continue;
-
         const payload = {
           ...row,
           object_id: object.value,
@@ -111,9 +121,9 @@ export default function CommonRegistry() {
         };
 
         if (row.id) {
-          await api.put(`/api/project-sections/${row.id}`, payload);
+          await api.put(`/projects/sections/${row.id}`, payload); 
         } else {
-          await api.post(`/api/project-sections`, payload);
+          await api.post(`/projects/sections`, payload); 
         }
       }
 
@@ -128,7 +138,6 @@ export default function CommonRegistry() {
 
   return (
     <PageWrapper title="Общий реестр (по объектам)">
-      {/* === Блок выбора стройки и объекта === */}
       <div className="group-box border border-[--color-border] p-4 mb-4">
         <h3 className="group-box-title mb-4 text-[--color-primary]">Объект</h3>
         <div className="grid grid-cols-6 gap-4">
@@ -152,13 +161,10 @@ export default function CommonRegistry() {
         </div>
       </div>
 
-      {/* === Реестр работ и разделы === */}
       {object?.value && (
         <>
           <div className="group-box border border-[--color-border] p-4 mb-4">
-            <h3 className="group-box-title mb-4 text-[--color-primary]">
-              Реестр работ
-            </h3>
+            <h3 className="group-box-title mb-4 text-[--color-primary]">Реестр работ</h3>
             <EditableTable
               data={workRegistry}
               onChange={setWorkRegistry}
@@ -170,9 +176,7 @@ export default function CommonRegistry() {
           </div>
 
           <div className="group-box border border-[--color-border] p-4 mb-4">
-            <h3 className="group-box-title mb-4 text-[--color-primary]">
-              Разделы проекта
-            </h3>
+            <h3 className="group-box-title mb-4 text-[--color-primary]">Разделы проекта</h3>
             <EditableTable
               data={projectSections}
               onChange={setProjectSections}
@@ -206,3 +210,5 @@ export default function CommonRegistry() {
     </PageWrapper>
   );
 }
+
+

@@ -19,7 +19,12 @@ async def create_project(data: ProjectIn, session: AsyncSession = Depends(get_as
     session.add(project)
     await session.commit()
     await session.refresh(project)
-    return project
+
+    return {
+        "id": project.id,
+        "object_id": project.object_id,
+        "name": project.name,
+    }
 
 
 @router.get("/", response_model=list[ProjectOut])
@@ -72,7 +77,7 @@ async def get_project_and_sections_by_object(
                 "section_name": s.section_name,
                 "discipline": s.discipline,
                 "designer": s.designer,
-                "organization": s.sheet_info
+                "sheet_info": s.sheet_info
             } for s in sections
         ]
     }
@@ -106,3 +111,23 @@ async def delete_section(
 
     await session.delete(section)
     await session.commit()
+    
+@router.put("/sections/{section_id}", response_model=ProjectSectionOut)
+async def update_section(
+    section_id: int,
+    data: ProjectSectionIn,
+    session: AsyncSession = Depends(get_async_session)
+):
+    result = await session.execute(
+        select(ProjectSection).where(ProjectSection.id == section_id)
+    )
+    section = result.scalar_one_or_none()
+    if not section:
+        raise HTTPException(status_code=404, detail="Раздел проекта не найден")
+
+    for key, value in data.dict().items():
+        setattr(section, key, value)
+
+    await session.commit()
+    await session.refresh(section)
+    return section

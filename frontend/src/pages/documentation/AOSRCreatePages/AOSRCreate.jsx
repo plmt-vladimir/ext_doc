@@ -13,13 +13,74 @@ import { useAOSRCreate } from "./AOSRCreateContext";
 import api from "@/api/axios";
 
 export default function AOSRCreate() {
-  const { common, setCommon } = useAOSRCreate();
+  const { common, setCommon, setDescription } = useAOSRCreate();
 
+// СП
+useEffect(() => {
+  api.get("/sp")
+    .then((res) => {
+      const options = res.data.map((sp) => ({
+        label: sp.name,  
+        value: sp.name
+      }));
+      setSpOptions(options);
+    })
+    .catch((err) => console.error("Ошибка загрузки СП:", err));
+}, []);
+  // Разделы проекта
+useEffect(() => {
+  if (!common.object) {
+    setProjectSections([]);
+    return;
+  }
+
+  api.get(`/projects/by-object/${common.object}`).then(res => {
+    const sections = res.data.sections || [];
+
+    const options = sections.map(sec => ({
+      value: sec.id,
+      label: `${sec.section_code} – ${sec.section_name}`,
+      data: sec // сохраняем полную структуру
+    }));
+
+    setProjectSections(options);
+  });
+}, [common.object]);
   // Локальные стейты для списков
   const [sites, setSites] = useState([]);
   const [objects, setObjects] = useState([]);
   const [zones, setZones] = useState([]);
+  const [statuses, setStatuses] = useState([]);
+  const [registryOptions, setRegistryOptions] = useState([]);
+  const [projectSections, setProjectSections] = useState([]);
+  const [spOptions, setSpOptions] = useState([]);
 
+  //Получаем список реестра
+  useEffect(() => {
+    if (!common.object) {
+      setRegistryOptions([]);
+      return;
+    }
+    api.get("/dictionaries/work-registry", {
+      params: { object_id: common.object }
+    }).then(res => {
+      const options = res.data.map(item => ({
+        value: item.code,
+        label: `${item.code} — ${item.title}`
+      }));
+      setRegistryOptions(options);
+    });
+  }, [common.object]);
+  // Загружаем статусы акта
+  useEffect(() => {
+    api.get("/dictionaries/act-statuses").then(res => {
+      const options = res.data.map(s => ({
+        value: s.code,
+        label: s.label
+      }));
+      setStatuses(options);
+    });
+  }, []);
   // Загружаем стройки
   useEffect(() => {
     api.get("/construction/sites").then(res =>
@@ -58,23 +119,29 @@ export default function AOSRCreate() {
     if (!common.object) {
       setZones([]);
       setCommon(c => ({ ...c, section: "" }));
+      setDescription(d => ({ ...d, codeSection: "" })); // ⬅ Сброс кода участка
       return;
     }
-    api.get(`/construction/zones/${common.object}`).then(res =>
-      setZones(
-        res.data.map(zone => ({
-          value: zone.id,
-          label: zone.name
-        }))
-      )
-    );
-    setCommon(c => ({ ...c, section: "" }));
-    // eslint-disable-next-line
+
+    api.get(`/construction/zones/${common.object}`).then(res => {
+      const options = res.data.map(zone => ({
+        value: zone.id,
+        label: zone.name,
+        code: zone.code, // ⬅ ВАЖНО: добавляем code
+      }));
+      setZones(options);
+
+      // если уже выбран участок, проставим codeSection
+      const selected = options.find(z => z.value === common.section);
+      if (selected) {
+        setDescription(d => ({ ...d, codeSection: selected.code }));
+      }
+    });
   }, [common.object]);
 
   const tabs = [
-    { label: "Описание работ", component: <AOSRDescriptionTab /> },
-    { label: "Нормативная документация", component: <AOSRNormTab /> },
+    { label: "Описание работ", component: <AOSRDescriptionTab registryOptions={registryOptions} /> },
+    { label: "Нормативная документация", component: <AOSRNormTab projectSections={projectSections} spOptions={spOptions} /> },
     { label: "Материалы", component: <AOSRMaterialsTab /> },
     { label: "Исполнительная документация", component: <AOSRDocsTab /> },
     { label: "Ответственные лица", component: <AOSRResponsibleTab /> },
@@ -89,7 +156,7 @@ export default function AOSRCreate() {
           <ComboBox
             placeholder="Стройка"
             options={sites}
-            value={common.construction}        
+            value={common.construction}
             onChange={option => setCommon(c => ({ ...c, construction: option?.value || "" }))}
             className="col-span-2"
           />
@@ -105,7 +172,15 @@ export default function AOSRCreate() {
             placeholder="Участок"
             options={zones}
             value={common.section}
-            onChange={option => setCommon(c => ({ ...c, section: option?.value || "" }))}
+            onChange={option => {
+              setCommon(c => ({ ...c, section: option?.value || "" }));
+
+              if (option?.code) {
+                setDescription(d => ({ ...d, codeSection: option.code }));
+              } else {
+                setDescription(d => ({ ...d, codeSection: "" }));
+              }
+            }}
             className="col-span-2"
             disabled={!common.object}
           />
@@ -120,7 +195,7 @@ export default function AOSRCreate() {
             className="col-span-1"
           />
           <Input
-            placeholder="Полное наименование акта"
+            placeholder="Наименование акта"
             value={common.actName}
             onChange={e => setCommon(c => ({ ...c, actName: e.target.value }))}
             className="col-span-4"
@@ -131,9 +206,11 @@ export default function AOSRCreate() {
             onChange={e => setCommon(c => ({ ...c, status: e.target.value }))}
           >
             <option value="">Статус акта</option>
-            <option value="Черновик">Черновик</option>
-            <option value="Подписан">Подписан</option>
-            <option value="Отклонён">Отклонён</option>
+            {statuses.map(status => (
+              <option key={status.value} value={status.value}>
+                {status.label}
+              </option>
+            ))}
           </select>
         </div>
       </div>

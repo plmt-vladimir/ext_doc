@@ -26,8 +26,8 @@ const defaultDescription = {
   ],
 };
 
-export default function AOSRDescriptionTab() {
-  const { description, setDescription } = useAOSRCreate();
+export default function AOSRDescriptionTab({ registryOptions }) {
+  const { common, description, setDescription } = useAOSRCreate();
 
   useEffect(() => {
     if (!description.selectors) {
@@ -41,6 +41,25 @@ export default function AOSRDescriptionTab() {
       }));
     }
   }, [description.selectors, setDescription]);
+
+  useEffect(() => {
+    const { actName } = common;
+    const { axes, marks } = description;
+
+    if (!actName && !axes && !marks) return;
+
+    const textParts = [];
+    if (actName) textParts.push(`${actName}`);
+    if (axes) textParts.push(`выполненные в осях ${axes}`);
+    if (marks) textParts.push(`на отметках ${marks}`);
+
+    const worksText = textParts.join(", ") + ".";
+
+    setDescription(d => ({
+      ...d,
+      worksText
+    }));
+  }, [common.actName, description.axes, description.marks]);
 
   return (
     <div className="flex flex-col gap-6">
@@ -146,11 +165,7 @@ export default function AOSRDescriptionTab() {
             />
             <ComboBox
               placeholder="Код реестра"
-              options={[
-                { label: "РПП-1", value: "РПП-1" },
-                { label: "РПП-2", value: "РПП-2" },
-                { label: "РПП-3", value: "РПП-3" },
-              ]}
+              options={registryOptions}
               value={description.registryCode}
               onChange={(val) => setDescription((d) => ({ ...d, registryCode: val }))}
             />
@@ -175,11 +190,10 @@ export default function AOSRDescriptionTab() {
             К освидетельствованию предъявлены следующие работы:
           </label>
           <Textarea
-            placeholder="Опишите предъявляемые работы"
+            placeholder="..."
             value={description.worksText}
-            onChange={(e) =>
-              setDescription((d) => ({ ...d, worksText: e.target.value }))
-            }
+            onChange={(e) => setDescription(d => ({ ...d, worksText: e.target.value }))}
+            className="..."
           />
         </div>
 

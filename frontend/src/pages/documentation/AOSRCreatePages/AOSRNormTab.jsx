@@ -3,15 +3,12 @@ import Textarea from "@/components/UI/Textarea";
 import FormField from "@/components/UI/FormField";
 import Button from "@/components/UI/Button";
 import GroupBox from "@/components/UI/Groupbox";
+import ComboBox from "@/components/UI/ComboBox";
 import Select from "react-select";
 import { useEffect, useMemo } from "react";
 import { useAOSRCreate } from "./AOSRCreateContext";
 
-const normOptions = [
-  { label: "СП 70.13330.2012", value: "СП 70.13330.2012" },
-  { label: "ГОСТ 25100-2011", value: "ГОСТ 25100-2011" },
-  { label: "СНиП 3.03.01-87", value: "СНиП 3.03.01-87" },
-];
+
 
 // Формирование строки по ТЗ:
 function buildPresentation(data) {
@@ -32,7 +29,7 @@ function buildPresentationWithNorms(data) {
   return normsStr + pres;
 }
 
-export default function AOSRNormTab() {
+export default function AOSRNormTab({ projectSections, spOptions }) {
   const { norm, setNorm } = useAOSRCreate();
   const { main, aux } = norm;
 
@@ -100,13 +97,23 @@ export default function AOSRNormTab() {
     <GroupBox bordered className="w-full">
       <h4 className="group-box-title mb-2">{title}</h4>
       <div className="grid grid-cols-3 gap-4 mb-2">
-        <Input
+        <ComboBox
           placeholder="Раздел проекта"
-          value={data.section}
-          onChange={e => setNorm(prev => ({
-            ...prev,
-            [sectionKey]: { ...prev[sectionKey], section: e.target.value }
-          }))}
+          options={projectSections}
+          value={data.section ? projectSections.find(s => s.data.section_code === data.section) : null}
+          onChange={(selected) => {
+            setNorm(prev => ({
+              ...prev,
+              [sectionKey]: {
+                ...prev[sectionKey],
+                section: selected?.data.section_code || "",
+                code: selected?.data.section_name || "",
+                sheets: selected?.data.sheet_info || "",
+                fullName: selected?.data.discipline || "",
+                org: selected?.data.designer || ""
+              }
+            }));
+          }}
         />
         <Input
           placeholder="Шифр раздела"
@@ -151,7 +158,7 @@ export default function AOSRNormTab() {
       />
       <div className="flex gap-2 items-center mb-2">
         <Select
-          options={normOptions}
+          options={spOptions}
           isMulti
           placeholder="Нормативные документы и СП"
           value={data.norms}
