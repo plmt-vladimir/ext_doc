@@ -23,7 +23,8 @@ class AOOK(Base):
     axes: Mapped[str]                                                        # Оси конструкции
     marks: Mapped[str]                                                       # Отметки (высоты)
     notes: Mapped[str]                                                       # Дополнительные сведения
-
+    file_url: Mapped[str] = mapped_column(nullable=True)                     # Адрес сформированнаго акта
+    
     # Связи с подчинёнными таблицами
     sections = relationship("AOOK_Section", back_populates="aook")
     sp_links = relationship("AOOK_SP", back_populates="aook")

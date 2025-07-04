@@ -38,7 +38,7 @@ class QualityDocumentOut(BaseModel):
     issue_date: date
     expiry_date: date
     file_url: str
-    materials: List[str] 
+    materials: Optional[List[str]] = []
 
     class Config:
         from_attributes = True

@@ -1,8 +1,8 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-from modules.core.models.dictionaries import QualityDocType, ActStatus
-from modules.core.schemas.dictionaries import QualityDocTypeOut, ActStatusOut, QualityDocTypeIn, ActStatusIn
+from modules.core.models.dictionaries import QualityDocType, ActStatus, WorkRegistry
+from modules.core.schemas.dictionaries import QualityDocTypeOut, ActStatusOut, QualityDocTypeIn, ActStatusIn, WorkRegistryIn, WorkRegistryOut
 from common.database import get_async_session
 
 router = APIRouter(prefix="/dictionaries", tags=["Dictionaries"])
@@ -38,3 +38,52 @@ async def add_act_status(
     await db.commit()
     await db.refresh(obj)
     return obj
+
+# Реестр работ 
+@router.get("/work-registry", response_model=list[WorkRegistryOut])
+async def get_work_registry(
+    object_id: int = Query(...),
+    db: AsyncSession = Depends(get_async_session)
+):
+    result = await db.execute(select(WorkRegistry).where(WorkRegistry.object_id == object_id))
+    return result.scalars().all()
+
+@router.post("/work-registry", response_model=WorkRegistryOut)
+async def add_work_registry(
+    data: WorkRegistryIn,
+    db: AsyncSession = Depends(get_async_session)
+):
+    obj = WorkRegistry(**data.dict())
+    db.add(obj)
+    await db.commit()
+    await db.refresh(obj)
+    return obj
+
+@router.put("/work-registry/{id}", response_model=WorkRegistryOut)
+async def update_work_registry(
+    id: int,
+    data: WorkRegistryIn,
+    db: AsyncSession = Depends(get_async_session)
+):
+    result = await db.execute(select(WorkRegistry).where(WorkRegistry.id == id))
+    obj = result.scalar_one_or_none()
+    if not obj:
+        raise HTTPException(404, detail="Запись не найдена")
+    for key, value in data.dict().items():
+        setattr(obj, key, value)
+    await db.commit()
+    await db.refresh(obj)
+    return obj
+
+@router.delete("/work-registry/{id}")
+async def delete_work_registry(
+    id: int,
+    db: AsyncSession = Depends(get_async_session)
+):
+    result = await db.execute(select(WorkRegistry).where(WorkRegistry.id == id))
+    obj = result.scalar_one_or_none()
+    if not obj:
+        raise HTTPException(404, detail="Запись не найдена")
+    await db.delete(obj)
+    await db.commit()
+    return {"result": "ok"}

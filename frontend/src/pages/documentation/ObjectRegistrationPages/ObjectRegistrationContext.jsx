@@ -36,7 +36,7 @@ export const ObjectRegistrationProvider = ({ children }) => {
     objects: [],
     newObject: { name: "", shotname: "", address: "" },
     sections: [],
-    newSection: { object: "", name: "", address: "" },
+    newSection: { object: "", name: "", address: "", code: ""},
   });
 
   const [customerCard, setCustomerCard] = useState({ ...defaultCard });

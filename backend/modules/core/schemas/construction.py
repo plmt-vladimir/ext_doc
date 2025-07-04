@@ -27,6 +27,7 @@ class ZoneOut(BaseModel):
     id: int
     object_id: int
     name: str
+    code: str
 
     class Config:
         orm_mode = True
@@ -40,3 +41,4 @@ class ZoneCreate(BaseModel):
     object_id: int
     name: str
     address: str
+    code: str

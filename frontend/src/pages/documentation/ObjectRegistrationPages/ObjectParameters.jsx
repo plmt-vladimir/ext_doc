@@ -26,8 +26,8 @@ export default function ObjectParameters() {
 
   // Validate section fields before adding
   const validateSectionFields = () => {
-    const { object, name, address } = objectParameters.newSection;
-    return object && name && address;
+    const { object, name, address, code } = objectParameters.newSection;
+    return object && name && address && code;
   };
 
   // Add object with validation
@@ -45,7 +45,6 @@ export default function ObjectParameters() {
     });
   };
 
-  // Add section with validation
   const addSection = () => {
     if (!validateSectionFields()) {
       setModalTitle('Ошибка');
@@ -56,7 +55,7 @@ export default function ObjectParameters() {
     setObjectParameters({
       ...objectParameters,
       sections: [...objectParameters.sections, objectParameters.newSection],
-      newSection: { object: '', name: '', address: '' },
+      newSection: { object: '', name: '', address: '', code: ''},
     });
   };
 
@@ -90,6 +89,7 @@ export default function ObjectParameters() {
     "#",
     "Объект",
     "Участок",
+    "Код участка",
     "Адрес",
     "",
   ];
@@ -170,15 +170,8 @@ export default function ObjectParameters() {
 
           <div className="grid grid-cols-4 gap-4 mb-4">
             <div className="col-span-3">
-              <Input
-                placeholder="Адрес"
-                value={objectParameters.newObject.address}
-                onChange={(e) =>
-                  setObjectParameters({
-                    ...objectParameters,
-                    newObject: { ...objectParameters.newObject, address: e.target.value },
-                  })
-                }
+              <Input placeholder="Адрес" value={objectParameters.newObject.address}
+                onChange={(e) => setObjectParameters({ ...objectParameters, newObject: { ...objectParameters.newObject, address: e.target.value }, })}
               />
             </div>
             <div className="col-span-1">
@@ -209,12 +202,14 @@ export default function ObjectParameters() {
         {/* Участки */}
         <div className="group-box border border-[--color-border] col-span-2">
           <h3 className="group-box-title mb-4">Участки</h3>
+
+          {/* Строка 1: Объект, Код, Кнопка */}
           <div className="grid grid-cols-4 gap-4 mb-4">
             <div className="col-span-2">
               <ComboBox
                 options={objectParameters.objects.map((obj) => ({
                   value: obj.shotname,
-                  label: obj.name,
+                  label: obj.shotname,
                 }))}
                 placeholder="Выберите объект"
                 value={objectParameters.newSection.object}
@@ -225,31 +220,15 @@ export default function ObjectParameters() {
                   })
                 }
               />
-
             </div>
-            <div className="col-span-2">
+            <div className="col-span-1">
               <Input
-                placeholder="Название участка"
-                value={objectParameters.newSection.name}
+                placeholder="Код участка"
+                value={objectParameters.newSection.code}
                 onChange={(e) =>
                   setObjectParameters({
                     ...objectParameters,
-                    newSection: { ...objectParameters.newSection, name: e.target.value },
-                  })
-                }
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-4 gap-4 mb-4">
-            <div className="col-span-3">
-              <Input
-                placeholder="Адрес"
-                value={objectParameters.newSection.address}
-                onChange={(e) =>
-                  setObjectParameters({
-                    ...objectParameters,
-                    newSection: { ...objectParameters.newSection, address: e.target.value },
+                    newSection: { ...objectParameters.newSection, code: e.target.value },
                   })
                 }
               />
@@ -259,6 +238,35 @@ export default function ObjectParameters() {
             </div>
           </div>
 
+          {/* Строка 2: Название участка */}
+          <div className="grid grid-cols-1 gap-4 mb-4">
+            <Input
+              placeholder="Название участка"
+              value={objectParameters.newSection.name}
+              onChange={(e) =>
+                setObjectParameters({
+                  ...objectParameters,
+                  newSection: { ...objectParameters.newSection, name: e.target.value },
+                })
+              }
+            />
+          </div>
+
+          {/* Строка 3: Адрес */}
+          <div className="grid grid-cols-1 gap-4 mb-4">
+            <Input
+              placeholder="Адрес"
+              value={objectParameters.newSection.address}
+              onChange={(e) =>
+                setObjectParameters({
+                  ...objectParameters,
+                  newSection: { ...objectParameters.newSection, address: e.target.value },
+                })
+              }
+            />
+          </div>
+
+          {/* Таблица участков */}
           <Table
             headers={sectionHeaders}
             pageSize={10}
@@ -266,11 +274,12 @@ export default function ObjectParameters() {
               idx + 1,
               section.object,
               section.name,
+              section.code,
               section.address,
               <Trash2
                 key={idx}
                 className="cursor-pointer text-red-600 mx-auto"
-                onClick={e => {
+                onClick={(e) => {
                   e.stopPropagation();
                   handleDeleteSection(idx);
                 }}

@@ -25,3 +25,14 @@ class ActStatusIn(BaseModel):
     code: str
     label: str
     order: int = 0
+
+class WorkRegistryIn(BaseModel):
+    object_id: int
+    code: str
+    title: str
+
+class WorkRegistryOut(WorkRegistryIn):
+    id: int
+
+    class Config:
+        from_attributes = True

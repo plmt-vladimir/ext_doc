@@ -19,6 +19,7 @@ class AOSRBase(BaseModel):
     work_type_label: str
     zone_id: int
     object_id: int
+    file_url: str 
 
 class AOSRCreate(AOSRBase):
     pass

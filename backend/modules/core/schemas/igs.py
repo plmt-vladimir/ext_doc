@@ -13,7 +13,7 @@ class IgsSchema(BaseModel):
     
     class Config:
         orm_mode = True
-        extra = "forbid"  # 🔒 запретит лишние поля, включая id
+        extra = "forbid"  
 
 
 class IgsOut(IgsSchema):

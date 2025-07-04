@@ -35,6 +35,7 @@ class ConstructionZone(Base):
     object_id = Column(Integer, ForeignKey("construction_objects.id", ondelete="CASCADE"))  # Привязка к объекту
     name = Column(String, nullable=False)   # Название участка (например, "Участок 3")
     address = Column(String)                # Адрес или описание местоположения участка
+    code = Column(String(50), nullable=False) # код участка
 
     # Обратная связь с объектом
     object = relationship("ConstructionObject", back_populates="zones")

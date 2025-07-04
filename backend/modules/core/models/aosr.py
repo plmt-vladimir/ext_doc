@@ -23,6 +23,7 @@ class AOSR(Base):
     axes: Mapped[str]                                                 # Оси (по таблице)
     marks: Mapped[str]                                                # Отметки (высоты)
     work_type_label: Mapped[str]                                      # Название типа работ (по таблице)
+    file_url: Mapped[str] = mapped_column(nullable=True)              # Адрес сформированнаго акта
 
     sections = relationship("AOSRSection", back_populates="aosr")
     sps = relationship("AOSR_SP", back_populates="aosr")

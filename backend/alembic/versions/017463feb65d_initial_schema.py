@@ -1,8 +1,8 @@
-"""Initial
+"""Initial schema
 
-Revision ID: 95120b86c769
+Revision ID: 017463feb65d
 Revises: 
-Create Date: 2025-07-02 19:39:27.712880
+Create Date: 2025-07-04 07:03:17.739106
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = '95120b86c769'
+revision: str = '017463feb65d'
 down_revision: Union[str, Sequence[str], None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -70,17 +70,6 @@ def upgrade() -> None:
     sa.PrimaryKeyConstraint('id')
     )
     op.create_index(op.f('ix_organizations_id'), 'organizations', ['id'], unique=False)
-    op.create_table('project_registry',
-    sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('parent_id', sa.Integer(), nullable=True),
-    sa.Column('title', sa.String(length=255), nullable=False),
-    sa.Column('code', sa.String(length=100), nullable=False),
-    sa.Column('level', sa.Integer(), nullable=False),
-    sa.Column('description', sa.Text(), nullable=True),
-    sa.ForeignKeyConstraint(['parent_id'], ['project_registry.id'], ),
-    sa.PrimaryKeyConstraint('id')
-    )
-    op.create_index(op.f('ix_project_registry_id'), 'project_registry', ['id'], unique=False)
     op.create_table('quality_doc_types',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('code', sa.String(), nullable=False),
@@ -131,7 +120,7 @@ def upgrade() -> None:
     sa.Column('full_name', sa.String(), nullable=False),
     sa.Column('short_name', sa.String(), nullable=True),
     sa.Column('address', sa.String(), nullable=True),
-    sa.ForeignKeyConstraint(['site_id'], ['construction_sites.id'], ),
+    sa.ForeignKeyConstraint(['site_id'], ['construction_sites.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('org_employees',
@@ -142,7 +131,7 @@ def upgrade() -> None:
     sa.Column('ins', sa.String(), nullable=False),
     sa.Column('decree_number', sa.String(), nullable=False),
     sa.Column('decree_date', sa.Date(), nullable=False),
-    sa.ForeignKeyConstraint(['organization_id'], ['organizations.id'], ),
+    sa.ForeignKeyConstraint(['organization_id'], ['organizations.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_index(op.f('ix_org_employees_id'), 'org_employees', ['id'], unique=False)
@@ -151,7 +140,8 @@ def upgrade() -> None:
     sa.Column('object_id', sa.Integer(), nullable=True),
     sa.Column('name', sa.String(), nullable=False),
     sa.Column('address', sa.String(), nullable=True),
-    sa.ForeignKeyConstraint(['object_id'], ['construction_objects.id'], ),
+    sa.Column('code', sa.String(length=50), nullable=False),
+    sa.ForeignKeyConstraint(['object_id'], ['construction_objects.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('org_role_assignments',
@@ -162,11 +152,28 @@ def upgrade() -> None:
     sa.Column('role_id', sa.Integer(), nullable=False),
     sa.ForeignKeyConstraint(['construction_object_id'], ['construction_objects.id'], ),
     sa.ForeignKeyConstraint(['construction_site_id'], ['construction_sites.id'], ),
-    sa.ForeignKeyConstraint(['organization_id'], ['organizations.id'], ),
+    sa.ForeignKeyConstraint(['organization_id'], ['organizations.id'], ondelete='CASCADE'),
     sa.ForeignKeyConstraint(['role_id'], ['org_roles.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_index(op.f('ix_org_role_assignments_id'), 'org_role_assignments', ['id'], unique=False)
+    op.create_table('projects',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('object_id', sa.Integer(), nullable=False),
+    sa.Column('name', sa.String(length=255), nullable=False),
+    sa.ForeignKeyConstraint(['object_id'], ['construction_objects.id'], ondelete='CASCADE'),
+    sa.PrimaryKeyConstraint('id')
+    )
+    op.create_index(op.f('ix_projects_id'), 'projects', ['id'], unique=False)
+    op.create_table('work_registry',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('object_id', sa.Integer(), nullable=False),
+    sa.Column('code', sa.String(length=50), nullable=False),
+    sa.Column('title', sa.String(length=255), nullable=False),
+    sa.ForeignKeyConstraint(['object_id'], ['construction_objects.id'], ondelete='CASCADE'),
+    sa.PrimaryKeyConstraint('id')
+    )
+    op.create_index(op.f('ix_work_registry_id'), 'work_registry', ['id'], unique=False)
     op.create_table('aooks',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('act_number', sa.String(), nullable=False),
@@ -181,6 +188,7 @@ def upgrade() -> None:
     sa.Column('axes', sa.String(), nullable=False),
     sa.Column('marks', sa.String(), nullable=False),
     sa.Column('notes', sa.String(), nullable=False),
+    sa.Column('file_url', sa.String(), nullable=True),
     sa.ForeignKeyConstraint(['object_id'], ['construction_objects.id'], ),
     sa.ForeignKeyConstraint(['zone_id'], ['construction_zones.id'], ),
     sa.PrimaryKeyConstraint('id'),
@@ -203,6 +211,7 @@ def upgrade() -> None:
     sa.Column('axes', sa.String(), nullable=False),
     sa.Column('marks', sa.String(), nullable=False),
     sa.Column('work_type_label', sa.String(), nullable=False),
+    sa.Column('file_url', sa.String(), nullable=True),
     sa.ForeignKeyConstraint(['object_id'], ['construction_objects.id'], ),
     sa.ForeignKeyConstraint(['zone_id'], ['construction_zones.id'], ),
     sa.PrimaryKeyConstraint('id')
@@ -259,6 +268,18 @@ def upgrade() -> None:
     sa.PrimaryKeyConstraint('id')
     )
     op.create_index(op.f('ix_labtests_id'), 'labtests', ['id'], unique=False)
+    op.create_table('project_sections',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('project_id', sa.Integer(), nullable=False),
+    sa.Column('section_code', sa.String(length=100), nullable=False),
+    sa.Column('section_name', sa.String(length=255), nullable=False),
+    sa.Column('discipline', sa.String(length=50), nullable=True),
+    sa.Column('designer', sa.String(length=255), nullable=True),
+    sa.Column('sheet_info', sa.String(length=255), nullable=True),
+    sa.ForeignKeyConstraint(['project_id'], ['projects.id'], ondelete='CASCADE'),
+    sa.PrimaryKeyConstraint('id')
+    )
+    op.create_index(op.f('ix_project_sections_id'), 'project_sections', ['id'], unique=False)
     op.create_table('aook_aosr',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('aook_id', sa.Integer(), nullable=False),
@@ -365,7 +386,7 @@ def upgrade() -> None:
     sa.Column('delivery_id', sa.Integer(), nullable=False),
     sa.Column('material_id', sa.Integer(), nullable=False),
     sa.Column('quantity', sa.Float(), nullable=False),
-    sa.ForeignKeyConstraint(['delivery_id'], ['deliveries.id'], ),
+    sa.ForeignKeyConstraint(['delivery_id'], ['deliveries.id'], ondelete='CASCADE'),
     sa.ForeignKeyConstraint(['material_id'], ['material_references.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
@@ -416,7 +437,7 @@ def upgrade() -> None:
     sa.Column('quantity', sa.Float(), nullable=False),
     sa.Column('act_type', sa.String(), nullable=False),
     sa.Column('act_id', sa.Integer(), nullable=False),
-    sa.ForeignKeyConstraint(['delivered_material_id'], ['delivered_materials.id'], ),
+    sa.ForeignKeyConstraint(['delivered_material_id'], ['delivered_materials.id'], ondelete='CASCADE'),
     sa.ForeignKeyConstraint(['zone_id'], ['construction_zones.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
@@ -460,6 +481,8 @@ def downgrade() -> None:
     op.drop_table('aook_igs')
     op.drop_index(op.f('ix_aook_aosr_id'), table_name='aook_aosr')
     op.drop_table('aook_aosr')
+    op.drop_index(op.f('ix_project_sections_id'), table_name='project_sections')
+    op.drop_table('project_sections')
     op.drop_index(op.f('ix_labtests_id'), table_name='labtests')
     op.drop_table('labtests')
     op.drop_index(op.f('ix_igs_id'), table_name='igs')
@@ -470,6 +493,10 @@ def downgrade() -> None:
     op.drop_table('aosr')
     op.drop_index(op.f('ix_aooks_id'), table_name='aooks')
     op.drop_table('aooks')
+    op.drop_index(op.f('ix_work_registry_id'), table_name='work_registry')
+    op.drop_table('work_registry')
+    op.drop_index(op.f('ix_projects_id'), table_name='projects')
+    op.drop_table('projects')
     op.drop_index(op.f('ix_org_role_assignments_id'), table_name='org_role_assignments')
     op.drop_table('org_role_assignments')
     op.drop_table('construction_zones')
@@ -484,8 +511,6 @@ def downgrade() -> None:
     op.drop_index(op.f('ix_quality_documents_id'), table_name='quality_documents')
     op.drop_table('quality_documents')
     op.drop_table('quality_doc_types')
-    op.drop_index(op.f('ix_project_registry_id'), table_name='project_registry')
-    op.drop_table('project_registry')
     op.drop_index(op.f('ix_organizations_id'), table_name='organizations')
     op.drop_table('organizations')
     op.drop_index(op.f('ix_org_roles_id'), table_name='org_roles')

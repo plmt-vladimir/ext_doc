@@ -6,7 +6,7 @@ import os
 import logging
 
 # Импорт роутеров
-from modules.core.routers import igs, construction, labtest, materials, organization, aosr, dictionaries, sp, user
+from modules.core.routers import igs, construction, labtest, materials, organization, aosr, dictionaries, sp, user, project_registry
 from modules.core.routers import auth_router
 
 # Настройка логгера
@@ -58,3 +58,4 @@ app.include_router(aosr.router)
 app.include_router(dictionaries.router)
 app.include_router(sp.router)
 app.include_router(user.router)
+app.include_router(project_registry.router)

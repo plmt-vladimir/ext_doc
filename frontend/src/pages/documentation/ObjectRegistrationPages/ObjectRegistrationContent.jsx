@@ -124,10 +124,9 @@ export default function ObjectRegistrationContent() {
         organization_id: orgId,
         role_id: roleId,
         construction_site_id: siteId,
-        construction_object_id: null, // если на объект — сюда id объекта
+        construction_object_id: null, 
       });
     } catch (err) {
-      // Можно не показывать ошибку пользователю, если уже назначено (бэкенд защитит от дублей)
       console.warn('Ошибка назначения роли:', err);
     }
   };
@@ -182,6 +181,7 @@ export default function ObjectRegistrationContent() {
             object_id: parentObjectId,
             name: section.name,
             address: section.address,
+            code: section.code,
           });
         }
       }
