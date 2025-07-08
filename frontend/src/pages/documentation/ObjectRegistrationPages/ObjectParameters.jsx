@@ -18,19 +18,16 @@ export default function ObjectParameters() {
   const [modalTitle, setModalTitle] = useState('');
   const [modalMessage, setModalMessage] = useState('');
 
-  // Validate object fields before adding
   const validateObjectFields = () => {
     const { name, shotname, address } = objectParameters.newObject;
     return name && shotname && address;
   };
 
-  // Validate section fields before adding
   const validateSectionFields = () => {
     const { object, name, address, code } = objectParameters.newSection;
     return object && name && address && code;
   };
 
-  // Add object with validation
   const addObject = () => {
     if (!validateObjectFields()) {
       setModalTitle('Ошибка');
@@ -75,7 +72,6 @@ export default function ObjectParameters() {
     });
   };
 
-  // Таблица объектов: №, полное и краткое наименование, адрес, действие
   const objectHeaders = [
     "#",
     "Полное наименование",

@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 app = FastAPI(title="ExecutiveDoc")
 
-# === CORS ===
+# CORS 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -24,7 +24,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# === Создание папок для хранения файлов ===
+# Создание папок для хранения файлов 
 DATA_DIRS = {
     "igs": Path("data/igs"),
     "labtests": Path("data/labtests"),
@@ -40,14 +40,14 @@ for name, path in DATA_DIRS.items():
     else:
         logger.info(f"Папка для {name.upper()} готова: {path.resolve()}")
 
-# === Раздача файлов ===
+#  Раздача файлов 
 app.mount("/files/igs", StaticFiles(directory=DATA_DIRS["igs"]), name="igs_files")
 app.mount("/files/labtests", StaticFiles(directory=DATA_DIRS["labtests"]), name="labtest_files")
 app.mount("/files/invoices", StaticFiles(directory=DATA_DIRS["invoices"]), name="invoice_files")
 app.mount("/files/quality_docs", StaticFiles(directory=DATA_DIRS["quality_docs"]), name="quality_doc_files")
 app.mount("/files/sp", StaticFiles(directory=DATA_DIRS["sp"]), name="sp_files")
 
-# === Роуты ===
+#  Роуты
 app.include_router(auth_router.router)
 app.include_router(igs.router)
 app.include_router(construction.router)

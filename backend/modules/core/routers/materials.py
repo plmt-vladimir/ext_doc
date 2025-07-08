@@ -25,7 +25,7 @@ from modules.core.schemas.materials import (
 
 router = APIRouter(prefix="/deliveries", tags=["Materials"])
 
-# === Папка для хранения накладных и сертификатов ===
+#  Папка для хранения накладных и сертификатов 
 DELIVERY_UPLOAD_DIR = FilePath("data/invoices")
 QUALITY_UPLOAD_DIR = FilePath("data/quality_docs")
 DELIVERY_UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
@@ -126,7 +126,6 @@ async def delete_material_reference(
     material = await db.get(MaterialReference, id)
     if not material:
         raise HTTPException(404, detail="Материал не найден")
-    # Проверка: есть ли связанные поставки (delivered_materials)
     result = await db.execute(
         select(DeliveredMaterial).where(DeliveredMaterial.material_id == id)
     )
@@ -164,7 +163,6 @@ async def list_quality_documents(db: AsyncSession = Depends(get_async_session)):
     docs = result.scalars().all()
     docs_out = []
     for doc in docs:
-        # Найти все DeliveredMaterialQualityDoc для этого quality_doc_id
         links_result = await db.execute(
             select(DeliveredMaterialQualityDoc).where(
                 DeliveredMaterialQualityDoc.quality_doc_id == doc.id
@@ -237,12 +235,12 @@ async def get_suppliers(
         query = query.where(Delivery.site_id == site_id)
     result = await db.execute(query)
     return [row[0] for row in result.fetchall() if row[0]]
-#   Получение доступных материалов по объекту/участку 
+#  Получение доступных материалов по объекту/участку 
 @router.get("/available", response_model=List[DeliveredMaterialOut])
 async def get_available_materials(
-    site_id: int = Query(...),
-    object_id: Optional[int] = Query(None),
-    zone_id: Optional[int] = Query(None),
+    site_id: int = Query(..., description="ID стройки (site_id)"),
+    object_id: Optional[int] = Query(None, description="ID объекта (object_id)"),
+    zone_id: Optional[int] = Query(None, description="ID участка (zone_id)"),
     session: AsyncSession = Depends(get_async_session)
 ):
     query = select(Delivery.id).where(Delivery.site_id == site_id)
@@ -250,6 +248,7 @@ async def get_available_materials(
         query = query.where(Delivery.object_id == object_id)
     if zone_id:
         query = query.where(Delivery.zone_id == zone_id)
+
     deliveries_result = await session.execute(query)
     delivery_ids = [row[0] for row in deliveries_result.fetchall()]
     if not delivery_ids:
@@ -264,10 +263,12 @@ async def get_available_materials(
         )
         .where(DeliveredMaterial.delivery_id.in_(delivery_ids))
     )
-    result = await session.execute(materials_query)
-    all_materials = result.scalars().all()
 
-    return all_materials
+    result = await session.execute(materials_query)
+    all_materials = result.unique().scalars().all()
+
+    return [DeliveredMaterialOut.from_orm(m) for m in all_materials]
+
 # Создание новой поставки 
 @router.post("/", response_model=dict)
 async def create_delivery_json(

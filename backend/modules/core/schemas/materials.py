@@ -20,7 +20,7 @@ class DeliveryOut(BaseModel):
     zone_id: Optional[int]
 
     class Config:
-        from_attributes = True
+        orm_mode = True
 
 class MaterialReferenceOut(BaseModel):
     id: int
@@ -29,7 +29,7 @@ class MaterialReferenceOut(BaseModel):
     unit: str
 
     class Config:
-        from_attributes = True
+        orm_mode = True
         
 class QualityDocumentOut(BaseModel):
     id: int
@@ -41,7 +41,7 @@ class QualityDocumentOut(BaseModel):
     materials: Optional[List[str]] = []
 
     class Config:
-        from_attributes = True
+        orm_mode = True
 class MaterialReferenceIn(BaseModel):
     name: str
     type: str
@@ -60,7 +60,7 @@ class DeliveredMaterialOut(BaseModel):
     quality_documents: List[QualityDocumentOut]   
 
     class Config:
-        from_attributes = True
+        orm_mode = True
 
 class DeliveryCreate(BaseModel):
     supplier: str

@@ -8,9 +8,6 @@ import Select from "react-select";
 import { useEffect, useMemo } from "react";
 import { useAOSRCreate } from "./AOSRCreateContext";
 
-
-
-// Формирование строки по ТЗ:
 function buildPresentation(data) {
   let rowStr = [data.section, data.code, data.sheets].filter(Boolean).join(", ");
   let lines = [];
@@ -20,7 +17,6 @@ function buildPresentation(data) {
   return lines.join("\n");
 }
 
-// Сборка строки с СП (в начале)
 function buildPresentationWithNorms(data) {
   const normsStr = (data.norms && data.norms.length)
     ? data.norms.map(n => n.label).join("; ") + " "
@@ -33,7 +29,6 @@ export default function AOSRNormTab({ projectSections, spOptions }) {
   const { norm, setNorm } = useAOSRCreate();
   const { main, aux } = norm;
 
-  // Автоформирование представления для main/aux при их изменении
   useEffect(() => {
     setNorm((prev) => ({
       ...prev,
@@ -56,7 +51,6 @@ export default function AOSRNormTab({ projectSections, spOptions }) {
     }));
   }, [aux.section, aux.code, aux.sheets, aux.fullName, aux.org, aux.norms, setNorm]);
 
-  // Общие textarea внизу — суммы представлений
   const combinedPresentation = useMemo(() =>
     [norm.main.presentation, norm.aux.presentation].filter(Boolean).join("\n\n"), [norm]
   );
@@ -64,7 +58,6 @@ export default function AOSRNormTab({ projectSections, spOptions }) {
     [norm.main.presentationWithNorms, norm.aux.presentationWithNorms].filter(Boolean).join("\n\n"), [norm]
   );
 
-  // Очищение всей формы
   const handleClear = () => {
     setNorm({
       main: {
@@ -92,7 +85,6 @@ export default function AOSRNormTab({ projectSections, spOptions }) {
     });
   };
 
-  // Отрисовка одного раздела
   const renderDocSection = (title, data, sectionKey) => (
     <GroupBox bordered className="w-full">
       <h4 className="group-box-title mb-2">{title}</h4>
@@ -209,7 +201,6 @@ export default function AOSRNormTab({ projectSections, spOptions }) {
 
       <div className="flex justify-end gap-4">
         <Button onClick={handleClear}>Очистить</Button>
-        <Button>Применить</Button>
       </div>
     </div>
   );

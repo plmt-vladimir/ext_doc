@@ -11,10 +11,10 @@ from modules.core.schemas.igs import IgsSchema, IgsOut
 
 router = APIRouter(prefix="/igs", tags=["IGS"])
 
-# === Папка для загрузки PDF-файлов ===
+# Папка для загрузки PDF-файлов
 UPLOAD_DIR = Path("data/igs")
 
-# === Загрузка файла ИГС (PDF) ===
+# Загрузка файла ИГС (PDF) 
 @router.post("/upload")
 async def upload_igs_file(file: UploadFile = File(...)):
     ext = file.filename.split('.')[-1]
@@ -27,7 +27,7 @@ async def upload_igs_file(file: UploadFile = File(...)):
     return {"file_url": f"/files/igs/{unique_name}"}
 
 
-# === Создание новой ИГС ===
+# Создание новой ИГС
 @router.post("/")
 async def create_igs(data: IgsSchema, session: AsyncSession = Depends(get_async_session)):
     igs = IGS(**data.dict())
@@ -37,7 +37,7 @@ async def create_igs(data: IgsSchema, session: AsyncSession = Depends(get_async_
     return {"id": igs.id}
 
 
-# === Получение списка ИГС с фильтрацией по стройке/объекту/участку ===
+#Получение списка ИГС с фильтрацией по стройке/объекту/участку 
 @router.get("/", response_model=list[IgsOut])
 async def get_igs(
     site_id: int = Query(..., description="ID строительной площадки (обязательно)"),
@@ -56,7 +56,7 @@ async def get_igs(
     return result.scalars().all()
 
 
-# === Удаление ИГС и связанного файла ===
+#Удаление ИГС и связанного файла
 @router.delete("/{igs_id}")
 async def delete_igs(igs_id: int, session: AsyncSession = Depends(get_async_session)):
     result = await session.execute(select(IGS).where(IGS.id == igs_id))
@@ -77,7 +77,7 @@ async def delete_igs(igs_id: int, session: AsyncSession = Depends(get_async_sess
     return {"detail": "Удалено"}
 
 
-# === Обновление существующей ИГС (включая замену файла) ===
+#Обновление ИГС 
 @router.put("/{igs_id}")
 async def update_igs(igs_id: int, data: IgsSchema, session: AsyncSession = Depends(get_async_session)):
     result = await session.execute(select(IGS).where(IGS.id == igs_id))

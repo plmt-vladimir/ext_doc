@@ -111,15 +111,13 @@ useEffect(() => {
     );
     setZones([]);
     setCommon(c => ({ ...c, object: "", section: "" }));
-    // eslint-disable-next-line
   }, [common.construction]);
 
-  // Загружаем участки при выборе объекта
   useEffect(() => {
     if (!common.object) {
       setZones([]);
       setCommon(c => ({ ...c, section: "" }));
-      setDescription(d => ({ ...d, codeSection: "" })); // ⬅ Сброс кода участка
+      setDescription(d => ({ ...d, codeSection: "" })); 
       return;
     }
 

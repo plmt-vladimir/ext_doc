@@ -46,7 +46,8 @@ async def get_work_registry(
     db: AsyncSession = Depends(get_async_session)
 ):
     result = await db.execute(select(WorkRegistry).where(WorkRegistry.object_id == object_id))
-    return result.scalars().all()
+    rows = result.scalars().all()
+    return [WorkRegistryOut.from_orm(row) for row in rows]
 
 @router.post("/work-registry", response_model=WorkRegistryOut)
 async def add_work_registry(

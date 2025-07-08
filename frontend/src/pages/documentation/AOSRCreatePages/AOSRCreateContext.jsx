@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useState } from "react";
 
-// Начальные структуры для каждого таба
 const defaultDescription = {
   startDate: "",
   endDate: "",
@@ -43,6 +42,15 @@ const defaultNorm = {
   }
 };
 
+const defaultEmployeeOptions = {
+  zakazchik: [],
+  stroitel: [],
+  stroitelKontrol: [],
+  proektirovshik: [],
+  raboty: [],
+  inyeLitsa: [],
+};
+
 const defaultMaterials = {
   materials: [],
   qtyState: {},
@@ -57,6 +65,7 @@ const defaultDocs = {
 };
 
 const initialPerson = {
+  id: "",
   name: "",
   order: "",
   date: "",
@@ -65,12 +74,12 @@ const initialPerson = {
 };
 
 const defaultResponsible = {
-  zakazchik: initialPerson,
-  stroitel: initialPerson,
-  stroitelKontrol: initialPerson,
-  proektirovshik: initialPerson,
-  raboty: initialPerson,
-  inyeLitsa: initialPerson,
+  zakazchik: { ...initialPerson },
+  stroitel: { ...initialPerson },
+  stroitelKontrol: { ...initialPerson },
+  proektirovshik: { ...initialPerson },
+  raboty: { ...initialPerson },
+  inyeLitsa: { ...initialPerson },
 };
 
 const defaultCommon = {
@@ -91,6 +100,7 @@ export function AOSRCreateProvider({ children }) {
   const [materials, setMaterials] = useState(defaultMaterials);
   const [docs, setDocs] = useState(defaultDocs);
   const [responsible, setResponsible] = useState(defaultResponsible);
+  const [employeeOptions, setEmployeeOptions] = useState(defaultEmployeeOptions);
 
   return (
     <AOSRCreateContext.Provider value={{
@@ -100,6 +110,7 @@ export function AOSRCreateProvider({ children }) {
       materials, setMaterials,
       docs, setDocs,
       responsible, setResponsible,
+      employeeOptions, setEmployeeOptions,
     }}>
       {children}
     </AOSRCreateContext.Provider>

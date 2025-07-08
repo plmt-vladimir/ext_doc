@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import api from "@/api/axios"; // Поправить в булущем
+import api from "@/api/axios"; 
 
 const ObjectRegistrationContext = createContext();
 
@@ -55,7 +55,7 @@ export const ObjectRegistrationProvider = ({ children }) => {
         const options = res.data.map(org => ({
           value: org.id,
           label: org.name,
-          full: org, // сохраняем полную организацию
+          full: org, 
         }));
         setOrganizationOptions(options);
       } catch (error) {

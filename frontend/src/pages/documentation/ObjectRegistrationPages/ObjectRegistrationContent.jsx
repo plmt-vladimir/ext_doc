@@ -75,7 +75,6 @@ export default function ObjectRegistrationContent() {
       ins: emp.ins,
       decree_number: emp.decree_number,            
       decree_date: normalizeDate(emp.orderDate || emp.decree_date),
-      // id не нужен для POST, но для PATCH должен быть в URL (как сейчас)
     };
   }
   
@@ -94,7 +93,6 @@ export default function ObjectRegistrationContent() {
   const handleSaveOrganization = async (organizationData, employees) => {
     let orgId = organizationData.id || organizationData.selectedOrganization;
   
-    // Маппируем данные организации
     const payload = mapOrganizationCardToBackend(organizationData);
   
     if (orgId) {
@@ -104,7 +102,7 @@ export default function ObjectRegistrationContent() {
       orgId = orgRes.data.id;
     }
   
-    // Сохраняем сотрудников
+
     for (const emp of employees) {
       const normalizedEmp = mapEmployeeToBackend(emp);
       if (!emp.id) {
@@ -186,14 +184,14 @@ export default function ObjectRegistrationContent() {
         }
       }
 
-      // 4. Сохраняем организации, сотрудников, назначаем роль!
+      // 4. Сохраняем организации, сотрудников, назначаем роль
       const customerId = await handleSaveOrganization(customerCard, customerCard.employees);
       const contractorId = await handleSaveOrganization(contractorCard, contractorCard.employees);
       const projectOrgId = await handleSaveOrganization(projectOrgCard, projectOrgCard.employees);
       const constructionControlId = await handleSaveOrganization(constructionControlCard, constructionControlCard.employees);
       const generalContractorId = await handleSaveOrganization(generalContractorCard, generalContractorCard.employees);
 
-      // 5. Назначаем роли организациям (siteId!)
+      // 5. Назначаем роли организациям
       await assignOrganizationRole(customerId, ROLE_IDS.customer, siteId);
       await assignOrganizationRole(contractorId, ROLE_IDS.contractor, siteId);
       await assignOrganizationRole(projectOrgId, ROLE_IDS.projectOrg, siteId);

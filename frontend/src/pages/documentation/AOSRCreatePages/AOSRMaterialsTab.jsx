@@ -1,20 +1,19 @@
 import { useEffect, useState } from "react";
 import GroupBox from "@/components/UI/Groupbox";
-import Textarea from "@/components/UI/Textarea";
 import Button from "@/components/UI/Button";
 import FilterableTable from "@/components/widgets/FilterableTable";
 import Table from "@/components/widgets/Table";
 import { Trash2, Plus } from "lucide-react";
 import { useAOSRCreate } from "./AOSRCreateContext";
-import api from "@/api/axios"; // ← не забудь импортировать свой axios instance
+import api from "@/api/axios";
 
 export default function AOSRMaterialsTab() {
-  const { materials, setMaterials, common } = useAOSRCreate(); // common нужен для site/object/section id
+  const { materials, setMaterials, common } = useAOSRCreate();
   const { materials: usedMaterials, qtyState, documentRepresentation } = materials;
   const [allMaterials, setAllMaterials] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  // Получаем реальные материалы по выбранному месту
+
   useEffect(() => {
     const fetchMaterials = async () => {
       if (!common.construction) return setAllMaterials([]);
@@ -28,22 +27,24 @@ export default function AOSRMaterialsTab() {
         if (common.section) params.zone_id = common.section;
 
         const res = await api.get("/deliveries/available", { params });
-        // Приводим к нужной структуре для FilterableTable
+
         setAllMaterials(
           res.data.map((item) => ({
             id: item.id,
             name: item.material.name,
             type: item.material.type,
             unit: item.material.unit,
-            certificate: item.quality_document.number,
-            quality_doc_type: item.quality_document.type,  
-            dateIssued: item.quality_document.issue_date,
-            dateExpires: item.quality_document.expiry_date,
             availableQty: item.quantity,
-            docId: item.quality_document.id,
             deliveredMaterialId: item.id,
             deliveryId: item.delivery.id,
-            // Можно добавить ещё нужные поля
+            certificates: item.quality_documents.map(doc => ({
+              id: doc.id,
+              number: doc.number,
+              type: doc.type,
+              issue_date: doc.issue_date,
+              expiry_date: doc.expiry_date,
+              file_url: doc.file_url,
+            })),
           }))
         );
       } catch (e) {
@@ -89,7 +90,7 @@ export default function AOSRMaterialsTab() {
           deliveredMaterialId: row.deliveredMaterialId,
           material: row.name,
           qualityDoc: row.certificate,
-          qualityDocType: row.quality_doc_type, 
+          qualityDocType: row.quality_doc_type,
           docId: row.docId,
           dateIssued: row.dateIssued,
           qty: qty,
@@ -112,20 +113,18 @@ export default function AOSRMaterialsTab() {
     });
   };
 
-  // Формируем строку для "представления в документе"
   useEffect(() => {
     setMaterials((prev) => ({
       ...prev,
       documentRepresentation: prev.materials.length
         ? prev.materials
-            .map(
-              (m) =>
-                `${m.material} ${m.qualityDocType} от ${formatDate(m.dateIssued)} (${m.qty} ${m.unit})`
-            )
-            .join("; ")
+          .map(
+            (m) =>
+              `${m.material} ${m.qualityDocType} от ${formatDate(m.dateIssued)} (${m.qty} ${m.unit})`
+          )
+          .join("; ")
         : "",
     }));
-    // eslint-disable-next-line
   }, [usedMaterials, setMaterials]);
 
   return (
@@ -137,9 +136,32 @@ export default function AOSRMaterialsTab() {
             { header: "Наименование", accessor: "name", filterType: "text" },
             { header: "Тип", accessor: "type", filterType: "text" },
             { header: "Ед.", accessor: "unit", filterType: null },
-            { header: "Сертификат", accessor: "certificate", filterType: "text" },
-            { header: "Дата выдачи", accessor: "dateIssued", filterType: "date", filterMode: "after" },
-            { header: "Годен до", accessor: "dateExpires", filterType: "date", filterMode: "after" },
+            {
+              header: "Сертификаты",
+              accessor: "certificates",
+              filterType: null,
+              render: (_, row) =>
+                row.certificates && row.certificates.length > 0
+                  ? (
+                    <ul className="space-y-1">
+                      {row.certificates.map(doc => (
+                        <li key={doc.id}>
+                          <a
+                            href={`${import.meta.env.VITE_REACT_APP_API_URL}${doc.file_url}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="underline text-blue-700 hover:text-blue-900 font-medium"
+                            title="Открыть документ"
+                          >
+                            {doc.type} №{doc.number}
+                          </a>
+                          {" "}от {formatDate(doc.issue_date)}
+                          {doc.expiry_date && ` (Годен до ${formatDate(doc.expiry_date)})`}
+                        </li>
+                      ))}
+                    </ul>
+                  ) : "—"
+            },
             {
               header: "Всего",
               accessor: "availableQty",
@@ -193,9 +215,7 @@ export default function AOSRMaterialsTab() {
                 return (
                   <button
                     onClick={() => handleAddFromTable(row)}
-                    className={`text-[--color-primary] hover:text-[--color-secondary] ${
-                      isDisabled ? "opacity-50 pointer-events-none" : ""
-                    }`}
+                    className={`text-[--color-primary] hover:text-[--color-secondary] ${isDisabled ? "opacity-50 pointer-events-none" : ""}`}
                     title="Добавить в список"
                     disabled={isDisabled}
                   >
@@ -211,11 +231,9 @@ export default function AOSRMaterialsTab() {
 
       <GroupBox title="Список применённых материалов" bordered>
         <Table
-          headers={["Материал", "Документ о качестве", "Дата", "Количество", "Ед.", ""]}
+          headers={["Материал", "Количество", "Ед.", ""]}
           rows={usedMaterials.map((item, idx) => [
             item.material,
-            `${item.qualityDocType} №${item.qualityDoc}`,
-            formatDate(item.dateIssued),
             item.qty,
             item.unit,
             <button
@@ -228,16 +246,6 @@ export default function AOSRMaterialsTab() {
           ])}
         />
       </GroupBox>
-
-      <div>
-        <Textarea
-          placeholder="Представление в документе"
-          value={documentRepresentation}
-          onChange={(e) => setMaterials((prev) => ({ ...prev, documentRepresentation: e.target.value }))}
-          className="h-24"
-        />
-      </div>
-
       <div className="flex justify-end gap-4">
         <Button
           onClick={() =>
@@ -255,7 +263,3 @@ export default function AOSRMaterialsTab() {
     </div>
   );
 }
-
-
-
-

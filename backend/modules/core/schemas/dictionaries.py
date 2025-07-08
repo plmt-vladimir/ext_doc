@@ -6,7 +6,7 @@ class QualityDocTypeOut(BaseModel):
     label: str
 
     class Config:
-        from_attributes = True
+         orm_mode = True
 
 class ActStatusOut(BaseModel):
     id: int
@@ -15,7 +15,7 @@ class ActStatusOut(BaseModel):
     order: int
 
     class Config:
-        from_attributes = True
+         orm_mode = True
         
 class QualityDocTypeIn(BaseModel):
     code: str
@@ -35,4 +35,4 @@ class WorkRegistryOut(WorkRegistryIn):
     id: int
 
     class Config:
-        from_attributes = True
+         orm_mode = True

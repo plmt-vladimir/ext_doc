@@ -10,10 +10,10 @@ from common.database import get_async_session
 
 router = APIRouter(prefix="/labtests", tags=["LabTests"])
 
-# === Папка для хранения файлов лабораторных испытаний ===
+# Папка для хранения файлов лабораторных испытаний 
 UPLOAD_DIR = Path("data/labtests")
 
-# === Загрузка PDF-файла ===
+# Загрузка PDF-файла
 @router.post("/upload")
 async def upload_labtest_file(file: UploadFile = File(...)):
     ext = file.filename.split('.')[-1]
@@ -25,7 +25,7 @@ async def upload_labtest_file(file: UploadFile = File(...)):
 
     return {"file_url": f"/files/labtests/{unique_name}"}
 
-# === Создание лабораторного испытания ===
+# Создание 
 @router.post("/")
 async def create_labtest(
     data: LabTestSchema,
@@ -37,7 +37,7 @@ async def create_labtest(
     await session.refresh(labtest)
     return {"id": labtest.id}
 
-# === Получение списка лабораторных испытаний с фильтрацией ===
+#Получение списка
 @router.get("/", response_model=list[LabTestOut])
 async def get_labtests(
     site_id: int = Query(...),
@@ -55,7 +55,7 @@ async def get_labtests(
     result = await session.execute(stmt)
     return result.scalars().all()
 
-# === Обновление лабораторного испытания (при необходимости удаляет старый файл) ===
+# Обновление 
 @router.put("/{labtest_id}")
 async def update_labtest(
     labtest_id: int,
@@ -83,7 +83,7 @@ async def update_labtest(
     await session.refresh(labtest)
     return {"detail": "Обновлено"}
 
-# === Удаление лабораторного испытания и файла ===
+# Удаление 
 @router.delete("/{labtest_id}")
 async def delete_labtest(
     labtest_id: int,
