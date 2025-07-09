@@ -5,6 +5,7 @@ import Input from "@/components/UI/Input";
 import ModalMessage from "@/components/UI/ModalMessage";
 import { useAuth } from "@/context/AuthContext";
 import api from "@/api/axios";
+import GroupBox from "@/components/UI/Groupbox";
 
 function PasswordModal({ isOpen, onClose, onSubmit, loading }) {
   const [oldPassword, setOldPassword] = useState("");
@@ -108,8 +109,7 @@ export default function UserProfile() {
 
   return (
     <PageWrapper title="Личный кабинет">
-      <div className="group-box border border-[--color-border] p-6 max-w-3xl">
-        <h3 className="group-box-title mb-4 text-[--color-primary]">Информация о пользователе</h3>
+      <GroupBox bordered className="border border-[--color-border] p-6 max-w-3xl" title="Информация о пользователе">
         <div className="grid grid-cols-2 gap-4 mb-4">
           <div>
             <label className="text-xs text-[--color-primary]">ФИО</label>
@@ -128,7 +128,7 @@ export default function UserProfile() {
         <div className="flex justify-end gap-2">
           <Button onClick={() => setShowModal(true)}>Сменить пароль</Button>
         </div>
-      </div>
+      </GroupBox>
       <PasswordModal
         isOpen={showModal}
         onClose={() => setShowModal(false)}

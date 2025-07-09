@@ -7,6 +7,7 @@ import Button from "@/components/UI/Button";
 import Input from "@/components/UI/Input";
 import { Pencil, Trash2 } from "lucide-react";
 import ModalMessage from "@/components/UI/ModalMessage";
+import GroupBox from "@/components/UI/GroupBox";
 
 // Преобразование org из API > форму на фронте
 function mapOrgToForm(org) {
@@ -262,9 +263,8 @@ export default function Contractors() {
   return (
     <PageWrapper title="Справочник организаций и сотрудников">
       <div className="flex flex-col gap-6">
-        <div className="group-box border border-[--color-border] p-4 mb-4">
+        <GroupBox title="Организации" bordered>
           <div className="flex justify-between items-center mb-4">
-            <h3 className="group-box-title mb-0 text-[--color-primary]">Организации</h3>
             <Button onClick={() => setShowAddOrgForm(true)}>Добавить организацию</Button>
           </div>
           <FilterableTable
@@ -323,13 +323,10 @@ export default function Contractors() {
               </div>
             </div>
           )}
-        </div>
+        </GroupBox>
 
-        <div className="group-box border border-[--color-border] p-4 mb-4">
+        <GroupBox title={`Сотрудники организации: ${selectedOrg?.name}`} bordered>
           <div className="flex justify-between items-center mb-4">
-            <h3 className="group-box-title mb-0 text-[--color-primary]">
-              Сотрудники организации: {selectedOrg?.name}
-            </h3>
             <Button onClick={handleAddEmployee}>Добавить</Button>
           </div>
           <Table
@@ -364,7 +361,7 @@ export default function Contractors() {
               </div>
             </div>
           )}
-        </div>
+        </GroupBox>
       </div>
       <ModalMessage
         open={modal.open}

@@ -7,6 +7,7 @@ import FilterableTable from "@/components/widgets/FilterableTable";
 import { Trash2 } from "lucide-react";
 import { useObjectRegistration } from "./ObjectRegistrationContext";
 import api from "@/api/axios";
+import GroupBox from "@/components/UI/GroupBox";
 
 export default function ConstructionControlCard() {
   const {
@@ -187,8 +188,7 @@ export default function ConstructionControlCard() {
         <div className="col-span-4"></div>
 
         {/* Первая группа: Организация */}
-        <div className="group-box border border-[--color-border] col-span-2">
-          <h3 className="group-box-title mb-4">Организация</h3>
+        <GroupBox className="col-span-2" title="Организация" bordered>
           <div className="grid grid-cols-1 gap-4 mb-4">
             <Input placeholder="Наименование" value={orgFullName} onChange={(e) => updateField("orgFullName", e.target.value)} />
             <Input placeholder="ОГРН" value={ogrn} onChange={(e) => updateField("ogrn", e.target.value)} />
@@ -203,12 +203,10 @@ export default function ConstructionControlCard() {
             <Input placeholder="СРО ОГРН" value={sroOgrn} onChange={(e) => updateField("sroOgrn", e.target.value)} />
             <Input placeholder="СРО ИНН" value={sroInn} onChange={(e) => updateField("sroInn", e.target.value)} />
           </div>
-        </div>
+        </GroupBox>
 
         {/* Вторая группа: Ответственные */}
-        <div className="group-box border border-[--color-border] col-span-5">
-          <h3 className="group-box-title mb-4">Ответственное лицо</h3>
-
+        <GroupBox className="col-span-5" title="Ответственное лицо" bordered>
           <div className="grid grid-cols-3 gap-4 mb-4">
             <Input placeholder="Ф.И.О." value={full_name} onChange={(e) => updateField("full_name", e.target.value)} />
             <Input placeholder="ИНС" value={ins} onChange={(e) => updateField("ins", e.target.value)} />
@@ -225,7 +223,7 @@ export default function ConstructionControlCard() {
             columns={employeeColumns}
             data={constructionControlCard.employees}
           />
-        </div>
+        </GroupBox>
       </div>
     </PageWrapper>
   );

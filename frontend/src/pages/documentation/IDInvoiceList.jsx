@@ -5,6 +5,7 @@ import ComboBox from "@/components/UI/ComboBox";
 import Button from "@/components/UI/Button";
 import FilterableTable from "@/components/widgets/FilterableTable";
 import { Pencil, Copy, Trash2 } from "lucide-react";
+import GroupBox from "@/components/UI/GroupBox";
 
 export default function IDInvoiceList() {
   const [construction, setConstruction] = useState("");
@@ -43,9 +44,7 @@ export default function IDInvoiceList() {
 
   return (
     <PageWrapper title="Накладные и реестры исполнительной документации">
-      <div className="group-box border border-[--color-border]">
-        <h3 className="group-box-title mb-4">Список документов</h3>
-
+      <GroupBox title="Список документов" bordered>
         <div className="grid grid-cols-12 gap-4 mb-4">
           <div className="col-span-4">
             <ComboBox placeholder="Стройка" options={[]} value={construction} onChange={setConstruction} />
@@ -109,7 +108,7 @@ export default function IDInvoiceList() {
         <div className="flex justify-end mt-4">
           <Button onClick={handleAdd}>Добавить</Button>
         </div>
-      </div>
+      </GroupBox>
     </PageWrapper>
   );
 }

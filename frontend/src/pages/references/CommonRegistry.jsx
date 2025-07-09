@@ -4,6 +4,7 @@ import ComboBox from "@/components/UI/ComboBox";
 import EditableTable from "@/components/widgets/EditableTable";
 import ModalMessage from "@/components/UI/ModalMessage";
 import api from "@/api/axios";
+import GroupBox from "@/components/UI/Groupbox";
 
 export default function CommonRegistry() {
   const [construction, setConstruction] = useState(null);
@@ -138,8 +139,7 @@ export default function CommonRegistry() {
 
   return (
     <PageWrapper title="Общий реестр (по объектам)">
-      <div className="group-box border border-[--color-border] p-4 mb-4">
-        <h3 className="group-box-title mb-4 text-[--color-primary]">Объект</h3>
+      <GroupBox bordered className="border border-[--color-border] p-4 mb-4" title="Объект">
         <div className="grid grid-cols-6 gap-4">
           <ComboBox
             placeholder="Стройка"
@@ -159,12 +159,11 @@ export default function CommonRegistry() {
             className="col-span-2"
           />
         </div>
-      </div>
+      </GroupBox>
 
       {object?.value && (
         <>
-          <div className="group-box border border-[--color-border] p-4 mb-4">
-            <h3 className="group-box-title mb-4 text-[--color-primary]">Реестр работ</h3>
+          <GroupBox bordered className="border border-[--color-border] p-4 mb-4" title="Реестр работ">
             <EditableTable
               data={workRegistry}
               onChange={setWorkRegistry}
@@ -173,10 +172,9 @@ export default function CommonRegistry() {
                 { key: "title", label: "Наименование" },
               ]}
             />
-          </div>
+          </GroupBox>
 
-          <div className="group-box border border-[--color-border] p-4 mb-4">
-            <h3 className="group-box-title mb-4 text-[--color-primary]">Разделы проекта</h3>
+          <GroupBox bordered className="border border-[--color-border] p-4 mb-4" title="Разделы проекта">
             <EditableTable
               data={projectSections}
               onChange={setProjectSections}
@@ -188,7 +186,7 @@ export default function CommonRegistry() {
                 { key: "sheet_info", label: "Листы" },
               ]}
             />
-          </div>
+          </GroupBox>
 
           <div className="flex justify-end mb-6">
             <button

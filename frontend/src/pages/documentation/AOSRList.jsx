@@ -6,6 +6,7 @@ import ComboBox from "@/components/UI/ComboBox";
 import Button from "@/components/UI/Button";
 import FilterableTable from "@/components/widgets/FilterableTable";
 import { Pencil, Copy, Trash2 } from "lucide-react";
+import GroupBox from "@/components/UI/GroupBox";
 
 export default function AOSRList() {
   // Каскадные фильтры
@@ -165,10 +166,7 @@ export default function AOSRList() {
 
   return (
     <PageWrapper title="Акты освидетельствования скрытых работ">
-      <div className="group-box border border-[--color-border]">
-        <h3 className="group-box-title mb-4">Акты освидетельствования скрытых работ</h3>
-
-        {/* Каскадные фильтры */}
+      <GroupBox title="Акты освидетельствования скрытых работ" bordered>
         <div className="grid grid-cols-12 gap-4 mb-4">
           <div className="col-span-4">
             <ComboBox
@@ -198,7 +196,6 @@ export default function AOSRList() {
           </div>
         </div>
 
-        {/* Таблица */}
         <FilterableTable
           columns={columns}
           data={aosrList}
@@ -207,7 +204,7 @@ export default function AOSRList() {
         <div className="flex justify-end mt-4">
           <Button onClick={handleAdd}>Добавить</Button>
         </div>
-      </div>
+      </GroupBox>
     </PageWrapper>
   );
 }

@@ -6,6 +6,7 @@ import Button from "@/components/UI/Button";
 import Input from "@/components/UI/Input";
 import { Pencil, Trash2 } from "lucide-react";
 import ModalMessage from "@/components/UI/ModalMessage";
+import GroupBox from "@/components/UI/GroupBox";
 
 function Modal({ isOpen, onClose, title, children }) {
   if (!isOpen) return null;
@@ -177,8 +178,7 @@ export default function MaterialTypes() {
 
   return (
     <PageWrapper title="Справочник материалов">
-      <div className="group-box border border-[--color-border] p-4 mb-4">
-        <h3 className="group-box-title mb-4 text-[--color-primary]">Материалы</h3>
+      <GroupBox title="Материалы" bordered>
         <FilterableTable
           columns={[
             { header: "Наименование", accessor: "name", filterType: "text" },
@@ -201,7 +201,7 @@ export default function MaterialTypes() {
         <div className="flex justify-end mt-4">
           <Button onClick={() => handleOpen()}>Добавить материал</Button>
         </div>
-      </div>
+      </GroupBox>
 
       {/* Модалка добавления/редактирования */}
       {showModal && (

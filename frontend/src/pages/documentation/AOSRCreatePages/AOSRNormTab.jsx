@@ -86,8 +86,7 @@ export default function AOSRNormTab({ projectSections, spOptions }) {
   };
 
   const renderDocSection = (title, data, sectionKey) => (
-    <GroupBox bordered className="w-full">
-      <h4 className="group-box-title mb-2">{title}</h4>
+    <GroupBox bordered className="w-full" title={title}>
       <div className="grid grid-cols-3 gap-4 mb-2">
         <ComboBox
           placeholder="Раздел проекта"

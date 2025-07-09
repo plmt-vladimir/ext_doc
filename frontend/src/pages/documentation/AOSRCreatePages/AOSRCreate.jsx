@@ -4,6 +4,7 @@ import ComboBox from "@/components/UI/ComboBox";
 import Input from "@/components/UI/Input";
 import Button from "@/components/UI/Button";
 import Tabs from "@/components/UI/Tabs";
+import GroupBox from "@/components/UI/Groupbox";
 import AOSRDescriptionTab from "./AOSRDescriptionTab";
 import AOSRNormTab from "./AOSRNormTab";
 import AOSRMaterialsTab from "./AOSRMaterialsTab";
@@ -147,8 +148,7 @@ useEffect(() => {
 
   return (
     <PageWrapper title="Создание акта освидетельствования">
-      <div className="group-box border border-[--color-border] mb-4">
-        <h3 className="group-box-title mb-4">Объект</h3>
+      <GroupBox bordered className="border border-[--color-border] mb-4" title="Объект">
         {/* Первая строка: стройка, объект, участок */}
         <div className="grid grid-cols-6 gap-4 mb-4">
           <ComboBox
@@ -211,7 +211,7 @@ useEffect(() => {
             ))}
           </select>
         </div>
-      </div>
+      </GroupBox>
 
       <Tabs tabs={tabs} />
 

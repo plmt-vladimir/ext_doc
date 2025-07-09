@@ -4,6 +4,7 @@ import PageWrapper from "@/components/layout/PageWrapper";
 import FilterableTable from "@/components/widgets/FilterableTable";
 import Button from "@/components/UI/Button";
 import Input from "@/components/UI/Input";
+import GroupBox from "@/components/UI/Groupbox";
 import { Pencil, Trash2, Upload } from "lucide-react";
 import ModalMessage from "@/components/UI/ModalMessage"; 
 
@@ -185,13 +186,12 @@ export default function SPList() {
 
   return (
     <PageWrapper title="Справочник СП">
-      <div className="group-box border border-[--color-border] p-4 mb-4">
-        <h3 className="group-box-title mb-4 text-[--color-primary]">Свод правил (СП)</h3>
+      <GroupBox bordered className="border border-[--color-border] p-4 mb-4" title="Свод правил (СП)">
         <FilterableTable columns={columns} data={standards} />
         <div className="flex justify-end mt-4">
           <Button onClick={() => handleOpen()}>Добавить СП</Button>
         </div>
-      </div>
+      </GroupBox>
 
       <Modal
         isOpen={showModal}

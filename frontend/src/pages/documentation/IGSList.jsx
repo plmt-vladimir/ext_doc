@@ -7,6 +7,7 @@ import Input from "@/components/UI/Input";
 import Button from "@/components/UI/Button";
 import Table from "@/components/widgets/Table";
 import { Upload, Trash2, Pencil } from "lucide-react";
+import GroupBox from "@/components/UI/GroupBox";
 
 export default function IgsList() {
   const [constructions, setConstructions] = useState([]);
@@ -211,8 +212,7 @@ export default function IgsList() {
   return (
     <PageWrapper title="Загрузка ИГС">
       <div className="grid grid-cols-2 gap-4">
-        <div className="group-box border border-[--color-border] col-span-1">
-          <h3 className="group-box-title mb-4">Объект</h3>
+        <GroupBox className="col-span-1" title="Объект" bordered>
           <div className="grid grid-cols-6 gap-4">
             <div className="col-span-6">
               <ComboBox placeholder="Строительство" options={constructions} value={construction} onChange={setConstruction} />
@@ -224,10 +224,9 @@ export default function IgsList() {
               <ComboBox placeholder="Участок" options={sections} value={section} onChange={setSection} />
             </div>
           </div>
-        </div>
+        </GroupBox>
 
-        <div className="group-box border border-[--color-border] col-span-1">
-          <h3 className="group-box-title mb-4">Загрузка ИГС</h3>
+        <GroupBox className="col-span-1" title="Загрузка ИГС" bordered>
           <div className="grid grid-cols-6 gap-4 mb-4">
             <Input className="col-span-3" placeholder="Имя документа" value={docName} onChange={(e) => setDocName(e.target.value)} />
             <div className="col-span-3 flex gap-2 items-center">
@@ -244,13 +243,12 @@ export default function IgsList() {
               {editIdx !== null ? "Сохранить" : "Добавить"}
             </Button>
           </div>
-        </div>
+        </GroupBox>
       </div>
 
-      <div className="group-box border border-[--color-border] mt-4">
-        <h3 className="group-box-title mb-4">Загруженные ИГС</h3>
+      <GroupBox className="mt-4" title="Загруженные ИГС" bordered>
         <Table headers={headers} rows={rows} pageSize={10} />
-      </div>
+      </GroupBox>
 
       <ModalMessage
         open={showModal}

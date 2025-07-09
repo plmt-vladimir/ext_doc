@@ -6,6 +6,7 @@ import FilterableTable from "@/components/widgets/FilterableTable";
 import { Pencil, Copy, Trash2 } from "lucide-react";
 import useCascadeConstruction from "@/hooks/useCascadeConstruction";
 import { useEffect, useState } from "react";
+import GroupBox from "@/components/UI/GroupBox";
 
 // Определи роли
 const ROLES = [
@@ -159,11 +160,7 @@ export default function AOOKList() {
 
   return (
     <PageWrapper title="Акты освидетельствования ответственных конструкций">
-      <div className="group-box border border-[--color-border]">
-        <h3 className="group-box-title mb-4">
-          Акты освидетельствования ответственных конструкций
-        </h3>
-        {/* Фильтры */}
+      <GroupBox title="Акты освидетельствования ответственных конструкций" bordered>
         <div className="grid grid-cols-12 gap-4 mb-4">
           <div className="col-span-4">
             <ComboBox
@@ -192,12 +189,13 @@ export default function AOOKList() {
             />
           </div>
         </div>
-        {/* Таблица */}
+
         <FilterableTable columns={columns} data={aookList} />
+
         <div className="flex justify-end mt-4">
           <Button onClick={handleAdd}>Добавить</Button>
         </div>
-      </div>
+      </GroupBox>
     </PageWrapper>
   );
 }

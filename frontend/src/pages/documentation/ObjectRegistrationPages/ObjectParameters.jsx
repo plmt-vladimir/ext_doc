@@ -3,6 +3,7 @@ import ComboBox from "@/components/UI/ComboBox";
 import Input from "@/components/UI/Input";
 import Button from "@/components/UI/Button";
 import Table from "@/components/widgets/Table";
+import GroupBox from "@/components/UI/Groupbox";
 import { Trash2 } from "lucide-react";
 import { useObjectRegistration } from "./ObjectRegistrationContext";
 import { useState } from "react";
@@ -101,8 +102,7 @@ export default function ObjectParameters() {
       />
       <div className="grid grid-cols-4 gap-5">
         {/* Параметры объекта */}
-        <div className="group-box border border-[--color-border] col-span-4">
-          <h3 className="group-box-title mb-4">Стройка</h3>
+        <GroupBox className="col-span-4" title="Стройка" bordered>
           <div className="grid grid-cols-3 gap-4 mb-4">
             <div className="col-span-3">
               <Input
@@ -132,11 +132,10 @@ export default function ObjectParameters() {
               />
             </div>
           </div>
-        </div>
+        </GroupBox>
 
         {/* Объекты */}
-        <div className="group-box border border-[--color-border] col-span-2">
-          <h3 className="group-box-title mb-4">Объекты</h3>
+        <GroupBox className="col-span-2" title="Объекты" bordered>
           <div className="grid grid-cols-4 gap-4 mb-4">
             <div className="col-span-3">
               <Input
@@ -193,12 +192,10 @@ export default function ObjectParameters() {
               />,
             ])}
           />
-        </div>
+        </GroupBox>
 
         {/* Участки */}
-        <div className="group-box border border-[--color-border] col-span-2">
-          <h3 className="group-box-title mb-4">Участки</h3>
-
+        <GroupBox className="col-span-2" title="Участки" bordered>
           {/* Строка 1: Объект, Код, Кнопка */}
           <div className="grid grid-cols-4 gap-4 mb-4">
             <div className="col-span-2">
@@ -282,7 +279,7 @@ export default function ObjectParameters() {
               />,
             ])}
           />
-        </div>
+        </GroupBox>
       </div>
     </PageWrapper>
   );

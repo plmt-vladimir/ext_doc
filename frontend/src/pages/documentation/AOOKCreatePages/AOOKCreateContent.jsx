@@ -3,6 +3,7 @@ import ComboBox from "@/components/UI/ComboBox";
 import Input from "@/components/UI/Input";
 import Button from "@/components/UI/Button";
 import Tabs from "@/components/UI/Tabs";
+import GroupBox from "@/components/UI/Groupbox";
 import { useAOOK } from "./AOOKContext";
 // Вкладки
 import AOOKDescriptionTab from "./AOOKDescriptionTab";
@@ -30,9 +31,7 @@ export default function AOOKCreateContent() {
 
   return (
     <PageWrapper title="Создание акта АООК">
-      <div className="group-box border border-[--color-border] mb-4">
-        <h3 className="group-box-title mb-4">Объект</h3>
-
+      <GroupBox bordered className="border border-[--color-border] mb-4" title="Объект">
         {/* Первая строка */}
         <div className="grid grid-cols-6 gap-4 mb-4">
           <ComboBox
@@ -82,7 +81,7 @@ export default function AOOKCreateContent() {
             <option value="Отклонён">Отклонён</option>
           </select>
         </div>
-      </div>
+      </GroupBox>
 
       <Tabs tabs={tabs} />
 

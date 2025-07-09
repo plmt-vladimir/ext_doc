@@ -9,6 +9,7 @@ import { Pencil, Copy, Trash2, Upload } from "lucide-react";
 import { useMaterialsJournal } from "./MaterialsJournalContext";
 import { useEffect, useMemo, useRef, useState } from "react";
 import axios from "axios";
+import GroupBox from "@/components/UI/GroupBox";
 
 const emptyForm = {
   group: "",
@@ -227,10 +228,9 @@ const handleSave = async () => {
   return (
     <PageWrapper title="Новое поступление материала">
       {/* Поставщик */}
-      <div className="group-box border border-[--color-border] p-4 mb-4">
-        <h3 className="group-box-title mb-4 text-[--color-primary]">Поставщик</h3>
-        <div className="grid grid-cols-3 gap-4">
-          <div className="col-span-2 grid grid-cols-2 gap-4">
+      <GroupBox title="Поставщик" bordered>
+        <div className="grid grid-cols-3 gap-6">
+          <div className="col-span-2 grid grid-cols-2 gap-6">
             <ComboBox allowFreeText={true} placeholder="Организация" options={suppliers}
               value={suppliers.find(opt => opt.value === supplierForm.organization) ??
                 (supplierForm.organization ? { value: supplierForm.organization, label: supplierForm.organization } : null)}
@@ -262,13 +262,12 @@ const handleSave = async () => {
             </div>
           </div>
         </div>
-      </div>
+      </GroupBox>
       {/* Добавление материала и документов */}
       <div className="grid grid-cols-2 gap-4">
         {/* Блок добавления материала */}
-        <div className="group-box border border-[--color-border] p-4 mb-4">
-          <h3 className="group-box-title mb-4 text-[--color-primary]">Добавление материала</h3>
-          <div className="flex flex-col gap-2 mb-4">
+        <GroupBox title="Добавление материала" bordered>
+          <div className="flex flex-col gap-6 mb-4">
             <ComboBox allowFreeText={true} placeholder="Наименование материала" options={materialOptions} value={addForm.name}
               onChange={val => setAddForm(f => ({ ...f, name: val.value }))} displayField="name" valueField="value" />
             <Input placeholder="Группа материалов" value={addForm.group} onChange={e => setAddForm(f => ({ ...f, group: e.target.value }))} disabled={!!addForm.name} />
@@ -291,10 +290,9 @@ const handleSave = async () => {
             />
           </div>
           <Button className="mt-4" onClick={handleAdd}>Добавить материал</Button>
-        </div>
+        </GroupBox>
         {/* Блок управления документами */}
-        <div className="group-box border border-[--color-border] p-4 mb-4">
-          <h3 className="group-box-title mb-4 text-[--color-primary]">Документы о качестве</h3>
+        <GroupBox title="Документы о качестве" bordered>
           {/* Выбор существующего документа */}
           <ComboBox
             placeholder="Выберите документ"
@@ -311,7 +309,7 @@ const handleSave = async () => {
           />
           <div className="my-2 text-center text-sm text-[--color-primary]">или создать новый</div>
           {/* Форма нового документа */}
-          <div className="flex flex-col gap-2 mb-2">
+          <div className="flex flex-col gap-6 mb-2">
             <ComboBox allowFreeText={true} placeholder="Тип документа"
               options={docTypes.map(t => ({
                 value: t.label,
@@ -331,12 +329,11 @@ const handleSave = async () => {
             </div>
             <Button onClick={handleAddQualityDoc}> Добавить документ</Button>
           </div>
-        </div>
+        </GroupBox>
       </div>
 
       {/* Поставленные материалы */}
-      <div className="group-box border border-[--color-border] p-4 mb-4">
-        <h3 className="group-box-title mb-4 text-[--color-primary]">Поставленные материалы</h3>
+      <GroupBox title="Поставленные материалы" bordered>
         <Table
           headers={["Группа", "Наименование", "Кол-во", "Ед. изм.", "Документы", "", ""]}
           rows={materials.map((item) => [
@@ -354,7 +351,7 @@ const handleSave = async () => {
             </div>
           ])}
         />
-      </div>
+      </GroupBox>
       <div className="flex justify-end">
         <Button onClick={handleSave}>Сохранить</Button>
       </div>
