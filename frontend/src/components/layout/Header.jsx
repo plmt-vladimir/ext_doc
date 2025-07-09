@@ -1,24 +1,33 @@
 import { useAuth } from "@/context/AuthContext";
+import { LogOut } from "lucide-react";
 
 export default function Header() {
   const { user, logout } = useAuth();
 
   return (
-    <header className="bg-[--color-primary] text-white px-4 py-2 shadow">
+    <header className="bg-[--color-background_menu] border-b border-[--color-border] text-[--color-primary] px-4 py-3 shadow-sm">
       <div className="flex justify-between items-center text-sm">
-        <div>
-          <span className="font-semibold">Пользователь: {user?.name || "—"}</span>{" "}
-          <span className="italic ml-2">Роль: {user?.role || "—"}</span>
+        <div className="flex items-center gap-4">
+          <span className="font-semibold whitespace-nowrap">
+            Пользователь: {user?.name || "—"}
+          </span>
+          <span className="italic text-xs whitespace-nowrap">
+            Роль: {user?.role || "—"}
+          </span>
         </div>
 
         <button
           onClick={logout}
-          className="text-white border border-white rounded px-3 py-1 text-xs hover:bg-white hover:text-[--color-primary] transition"
+          className="flex items-center gap-2 px-3 py-1 rounded-md border border-[--color-primary] text-[--color-primary] text-xs hover:bg-[--color-secondary]/10 transition"
         >
-          Выйти
+          <LogOut size={16} />
+          <span className="hidden sm:inline">Выйти</span>
         </button>
       </div>
     </header>
   );
 }
+
+
+
 

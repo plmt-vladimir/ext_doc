@@ -8,7 +8,7 @@ export default function MainLayout() {
 
   useEffect(() => {
     const handleMouseMove = (e) => {
-      const isNearTop = e.clientY <= 60; // если мышь в пределах 40px от верха
+      const isNearTop = e.clientY <= 60;
       setShowHeader(isNearTop);
     };
 
@@ -18,21 +18,20 @@ export default function MainLayout() {
 
   return (
     <div className="flex h-screen overflow-hidden bg-[--color-background] text-[--color-text]">
-      <aside className="w-64 border-r border-[--color-border] flex flex-col">
+      <aside className="relative group transition-all duration-300 w-16 hover:w-64 border-r border-[--color-border] flex flex-col bg-[--color-background_menu]">
         <Sidebar />
       </aside>
 
       <div className="flex-1 flex flex-col relative">
         {/* Появление при наведении в верхнюю область */}
         <div
-          className={`transition-all duration-300 z-50 ${
-            showHeader ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-full"
-          }`}
+          className={`transition-all duration-300 z-50 ${showHeader ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-full"
+            }`}
         >
           <Header />
         </div>
 
-        <main className="flex-1 overflow-y-auto p-6 mt-8">
+        <main className="flex-1 overflow-y-auto p-6 mt-2">
           <Outlet />
         </main>
       </div>

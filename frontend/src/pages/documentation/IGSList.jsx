@@ -8,6 +8,7 @@ import Button from "@/components/UI/Button";
 import Table from "@/components/widgets/Table";
 import { Upload, Trash2, Pencil } from "lucide-react";
 import GroupBox from "@/components/UI/GroupBox";
+import Label from "@/components/UI/Label";
 
 export default function IgsList() {
   const [constructions, setConstructions] = useState([]);
@@ -211,37 +212,65 @@ export default function IgsList() {
 
   return (
     <PageWrapper title="Загрузка ИГС">
-      <div className="grid grid-cols-2 gap-4">
-        <GroupBox className="col-span-1" title="Объект" bordered>
-          <div className="grid grid-cols-6 gap-4">
-            <div className="col-span-6">
+      <div className="grid grid-cols-5 gap-4">
+        {/* Блок выбора объекта */}
+        <GroupBox className="col-span-2" title="Объект" bordered>
+          <div className="flex flex-col gap-y-3">
+            <div className="flex flex-col">
+              <Label className="text-sm text-[--color-primary]">Строительство</Label>
               <ComboBox placeholder="Строительство" options={constructions} value={construction} onChange={setConstruction} />
             </div>
-            <div className="col-span-3">
+
+            <div className="flex flex-col">
+              <Label className="text-sm text-[--color-primary]">Объект</Label>
               <ComboBox placeholder="Объект" options={objects} value={object} onChange={setObject} />
             </div>
-            <div className="col-span-3">
+
+            <div className="flex flex-col">
+              <Label className="text-sm text-[--color-primary]">Участок</Label>
               <ComboBox placeholder="Участок" options={sections} value={section} onChange={setSection} />
             </div>
           </div>
         </GroupBox>
-
-        <GroupBox className="col-span-1" title="Загрузка ИГС" bordered>
+        {/* Блок загрузки */}
+        <GroupBox className="col-span-3" title="Загрузка ИГС" bordered>
           <div className="grid grid-cols-6 gap-4 mb-4">
-            <Input className="col-span-3" placeholder="Имя документа" value={docName} onChange={(e) => setDocName(e.target.value)} />
-            <div className="col-span-3 flex gap-2 items-center">
-              <input id="file-upload" type="file" onChange={handleUpload} className="hidden" />
-              <Button type="button" onClick={() => document.getElementById("file-upload")?.click()} className="flex items-center gap-2">
-                <Upload className="w-4 h-4 rotate-180" /> Загрузить файл
-              </Button>
-              <span className="text-sm text-gray-600 truncate">{fileName || "Файл не выбран"}</span>
+            <div className="col-span-3 flex flex-col">
+              <Label className="text-sm text-[--color-primary]">Имя документа</Label>
+              <Input placeholder="Имя документа" value={docName} onChange={(e) => setDocName(e.target.value)} />
             </div>
-            <Input placeholder="В осях" value={axes} onChange={(e) => setAxes(e.target.value)} className="col-span-2" />
-            <Input placeholder="Отметки" value={marks} onChange={(e) => setMarks(e.target.value)} className="col-span-2" />
-            <Input type="date" placeholder="Дата" value={date} onChange={(e) => setDate(e.target.value)} className="col-span-2" />
-            <Button onClick={handleSave} className="col-span-2 col-start-3" color={editIdx !== null ? "primary" : undefined}>
-              {editIdx !== null ? "Сохранить" : "Добавить"}
-            </Button>
+
+            <div className="col-span-3 flex flex-col">
+              <Label className="text-sm text-[--color-primary]">Файл</Label>
+              <div className="flex gap-2 items-center">
+                <input id="file-upload" type="file" onChange={handleUpload} className="hidden" />
+                <Button type="button" onClick={() => document.getElementById("file-upload")?.click()} className="flex items-center gap-2">
+                  <Upload className="w-4 h-4 rotate-180" /> Загрузить
+                </Button>
+                <span className="text-sm text-gray-600 truncate">{fileName || "Файл не выбран"}</span>
+              </div>
+            </div>
+
+            <div className="col-span-2 flex flex-col">
+              <Label className="text-sm text-[--color-primary]">В осях</Label>
+              <Input placeholder="В осях" value={axes} onChange={(e) => setAxes(e.target.value)} />
+            </div>
+
+            <div className="col-span-2 flex flex-col">
+              <Label className="text-sm text-[--color-primary]">Отметки</Label>
+              <Input placeholder="Отметки" value={marks} onChange={(e) => setMarks(e.target.value)} />
+            </div>
+
+            <div className="col-span-2 flex flex-col">
+              <Label className="text-sm text-[--color-primary]">Дата</Label>
+              <Input type="date" placeholder="Дата" value={date} onChange={(e) => setDate(e.target.value)} />
+            </div>
+
+            <div className="col-span-2 col-start-3 flex items-end">
+              <Button onClick={handleSave} className="w-full" color={editIdx !== null ? "primary" : undefined}>
+                {editIdx !== null ? "Сохранить" : "Добавить"}
+              </Button>
+            </div>
           </div>
         </GroupBox>
       </div>
@@ -254,7 +283,7 @@ export default function IgsList() {
         open={showModal}
         mode="notification"
         title="Ошибка"
-        message="Пожалуйста, заполните все обязательные поля:\nСтройка, Название, Оси, Отметки, Дата, Файл"
+        message="Пожалуйста, заполните все обязательные поля: Стройка, Название, Оси, Отметки, Дата, Файл"
         onCancel={() => setShowModal(false)}
       />
     </PageWrapper>

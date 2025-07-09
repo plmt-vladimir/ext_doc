@@ -8,6 +8,7 @@ import { Trash2 } from "lucide-react";
 import { useObjectRegistration } from "./ObjectRegistrationContext";
 import { useState } from "react";
 import ModalMessage from "@/components/UI/ModalMessage";
+import Label from "@/components/UI/Label";
 
 export default function ObjectParameters() {
   const {
@@ -53,7 +54,7 @@ export default function ObjectParameters() {
     setObjectParameters({
       ...objectParameters,
       sections: [...objectParameters.sections, objectParameters.newSection],
-      newSection: { object: '', name: '', address: '', code: ''},
+      newSection: { object: '', name: '', address: '', code: '' },
     });
   };
 
@@ -92,7 +93,7 @@ export default function ObjectParameters() {
   ];
 
   return (
-    <PageWrapper title="Регистрация объекта">
+    <PageWrapper title="Заполнение данных о составе строительства">
       <ModalMessage
         open={modalOpen}
         mode="notification"
@@ -103,75 +104,80 @@ export default function ObjectParameters() {
       <div className="grid grid-cols-4 gap-5">
         {/* Параметры объекта */}
         <GroupBox className="col-span-4" title="Стройка" bordered>
-          <div className="grid grid-cols-3 gap-4 mb-4">
-            <div className="col-span-3">
-              <Input
-                placeholder="Полное наименование объекта"
-                value={objectParameters.constructionName}
-                onChange={(e) =>
-                  setObjectParameters({ ...objectParameters, constructionName: e.target.value })
-                }
-              />
-            </div>
-            <div className="col-span-1">
-              <Input
-                placeholder="Краткое наименование"
-                value={objectParameters.constructionShort}
-                onChange={(e) =>
-                  setObjectParameters({ ...objectParameters, constructionShort: e.target.value })
-                }
-              />
-            </div>
-            <div className="col-span-2">
-              <Input
-                placeholder="Адрес"
-                value={objectParameters.constructionAddress}
-                onChange={(e) =>
-                  setObjectParameters({ ...objectParameters, constructionAddress: e.target.value })
-                }
-              />
-            </div>
+          <div className="grid grid-cols-6 gap-x-4 gap-y-3 mb-4 items-center">
+            <Label htmlFor="constructionName" className="text-[--color-primary], col-span-1">Полное наименование объекта</Label>
+            <Input
+              id="constructionName"
+              className="col-span-5"
+              placeholder="Полное наименование объекта"
+              value={objectParameters.constructionName}
+              onChange={(e) => setObjectParameters({ ...objectParameters, constructionName: e.target.value })}
+            />
+
+            <Label htmlFor="constructionShort" className="text-[--color-primary]">Краткое наименование</Label>
+            <Input
+              id="constructionShort"
+              className="col-span-5"
+              placeholder="Краткое наименование"
+              value={objectParameters.constructionShort}
+              onChange={(e) => setObjectParameters({ ...objectParameters, constructionShort: e.target.value })}
+            />
+
+            <Label htmlFor="constructionAddress" className="text-[--color-primary]">Адрес</Label>
+            <Input
+              id="constructionAddress"
+              className="col-span-5"
+              placeholder="Адрес"
+              value={objectParameters.constructionAddress}
+              onChange={(e) => setObjectParameters({ ...objectParameters, constructionAddress: e.target.value })}
+            />
           </div>
         </GroupBox>
-
         {/* Объекты */}
         <GroupBox className="col-span-2" title="Объекты" bordered>
-          <div className="grid grid-cols-4 gap-4 mb-4">
-            <div className="col-span-3">
-              <Input
-                placeholder="Полное наименование"
-                value={objectParameters.newObject.name}
-                onChange={(e) =>
-                  setObjectParameters({
-                    ...objectParameters,
-                    newObject: { ...objectParameters.newObject, name: e.target.value },
-                  })
-                }
-              />
-            </div>
-            <div className="col-span-1">
-              <Input
-                placeholder="Краткое наименование"
-                value={objectParameters.newObject.shotname}
-                onChange={(e) =>
-                  setObjectParameters({
-                    ...objectParameters,
-                    newObject: { ...objectParameters.newObject, shotname: e.target.value },
-                  })
-                }
-              />
-            </div>
-          </div>
+          <div className="grid grid-cols-4 gap-x-4 gap-y-3 mb-4 items-center">
+            <Label htmlFor="objectName" className="text-[--color-primary]">Полное наименование</Label>
+            <Input
+              id="objectName"
+              className="col-span-3"
+              placeholder="Полное наименование"
+              value={objectParameters.newObject.name}
+              onChange={(e) =>
+                setObjectParameters({
+                  ...objectParameters,
+                  newObject: { ...objectParameters.newObject, name: e.target.value },
+                })
+              }
+            />
 
-          <div className="grid grid-cols-4 gap-4 mb-4">
-            <div className="col-span-3">
-              <Input placeholder="Адрес" value={objectParameters.newObject.address}
-                onChange={(e) => setObjectParameters({ ...objectParameters, newObject: { ...objectParameters.newObject, address: e.target.value }, })}
-              />
-            </div>
-            <div className="col-span-1">
-              <Button onClick={addObject}>Добавить</Button>
-            </div>
+            <Label htmlFor="objectShort" className="text-[--color-primary]">Краткое наименование</Label>
+            <Input
+              id="objectShort"
+              className="col-span-3"
+              placeholder="Краткое наименование"
+              value={objectParameters.newObject.shotname}
+              onChange={(e) =>
+                setObjectParameters({
+                  ...objectParameters,
+                  newObject: { ...objectParameters.newObject, shotname: e.target.value },
+                })
+              }
+            />
+
+            <Label htmlFor="objectAddress" className="text-[--color-primary]">Адрес</Label>
+            <Input
+              id="objectAddress"
+              className="col-span-3"
+              placeholder="Адрес"
+              value={objectParameters.newObject.address}
+              onChange={(e) =>
+                setObjectParameters({
+                  ...objectParameters,
+                  newObject: { ...objectParameters.newObject, address: e.target.value },
+                })
+              }
+            />
+            <Button onClick={addObject}>Добавить</Button>
           </div>
 
           <Table
@@ -185,7 +191,7 @@ export default function ObjectParameters() {
               <Trash2
                 key={idx}
                 className="cursor-pointer text-red-600 mx-auto"
-                onClick={e => {
+                onClick={(e) => {
                   e.stopPropagation();
                   handleDeleteObject(idx);
                 }}
@@ -196,10 +202,12 @@ export default function ObjectParameters() {
 
         {/* Участки */}
         <GroupBox className="col-span-2" title="Участки" bordered>
-          {/* Строка 1: Объект, Код, Кнопка */}
-          <div className="grid grid-cols-4 gap-4 mb-4">
-            <div className="col-span-2">
+          <div className="grid grid-cols-4 gap-x-4 gap-y-3 mb-4 items-center">
+            {/* Объект */}
+            <Label htmlFor="sectionObject" className="text-[--color-primary]">Объект</Label>
+            <div className="col-span-3">
               <ComboBox
+                id="sectionObject"
                 options={objectParameters.objects.map((obj) => ({
                   value: obj.shotname,
                   label: obj.shotname,
@@ -214,8 +222,42 @@ export default function ObjectParameters() {
                 }
               />
             </div>
-            <div className="col-span-1">
+
+            {/* Название участка */}
+            <Label htmlFor="sectionName" className="text-[--color-primary]">Название участка</Label>
+            <Input
+              id="sectionName"
+              className="col-span-3"
+              placeholder="Название участка"
+              value={objectParameters.newSection.name}
+              onChange={(e) =>
+                setObjectParameters({
+                  ...objectParameters,
+                  newSection: { ...objectParameters.newSection, name: e.target.value },
+                })
+              }
+            />
+
+            {/* Адрес */}
+            <Label htmlFor="sectionAddress" className="text-[--color-primary]">Адрес</Label>
+            <Input
+              id="sectionAddress"
+              className="col-span-3"
+              placeholder="Адрес"
+              value={objectParameters.newSection.address}
+              onChange={(e) =>
+                setObjectParameters({
+                  ...objectParameters,
+                  newSection: { ...objectParameters.newSection, address: e.target.value },
+                })
+              }
+            />
+
+            {/* Код + кнопка */}
+            <Label htmlFor="sectionCode" className="text-[--color-primary]">Код участка</Label>
+            <div className="col-span-2">
               <Input
+                id="sectionCode"
                 placeholder="Код участка"
                 value={objectParameters.newSection.code}
                 onChange={(e) =>
@@ -226,37 +268,9 @@ export default function ObjectParameters() {
                 }
               />
             </div>
-            <div className="col-span-1">
+            <div className="col-span-1 flex justify-end">
               <Button onClick={addSection}>Добавить</Button>
             </div>
-          </div>
-
-          {/* Строка 2: Название участка */}
-          <div className="grid grid-cols-1 gap-4 mb-4">
-            <Input
-              placeholder="Название участка"
-              value={objectParameters.newSection.name}
-              onChange={(e) =>
-                setObjectParameters({
-                  ...objectParameters,
-                  newSection: { ...objectParameters.newSection, name: e.target.value },
-                })
-              }
-            />
-          </div>
-
-          {/* Строка 3: Адрес */}
-          <div className="grid grid-cols-1 gap-4 mb-4">
-            <Input
-              placeholder="Адрес"
-              value={objectParameters.newSection.address}
-              onChange={(e) =>
-                setObjectParameters({
-                  ...objectParameters,
-                  newSection: { ...objectParameters.newSection, address: e.target.value },
-                })
-              }
-            />
           </div>
 
           {/* Таблица участков */}
@@ -280,6 +294,7 @@ export default function ObjectParameters() {
             ])}
           />
         </GroupBox>
+
       </div>
     </PageWrapper>
   );

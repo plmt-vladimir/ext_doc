@@ -9,7 +9,7 @@ export default function FilterableTable({
   className = "",
   tableWidth = "w-full",
   pageSize = 50,
-  onRowClick
+  onRowClick,
 }) {
   const [filters, setFilters] = useState({});
   const [page, setPage] = useState(1);
@@ -34,7 +34,6 @@ export default function FilterableTable({
     return data.filter((row) =>
       columns.every((col) => {
         if (col.noFilter) return true;
-
         const filter = filters[col.accessor];
         if (!filter || filter === "") return true;
 
@@ -60,16 +59,12 @@ export default function FilterableTable({
 
   const sortedData = useMemo(() => {
     if (!sortBy) return filteredData;
-
     return [...filteredData].sort((a, b) => {
       const aVal = a[sortBy];
       const bVal = b[sortBy];
-
       if (aVal == null || bVal == null) return 0;
-
       const valA = typeof aVal === "string" ? aVal.toLowerCase() : aVal;
       const valB = typeof bVal === "string" ? bVal.toLowerCase() : bVal;
-
       if (valA < valB) return sortDirection === "asc" ? -1 : 1;
       if (valA > valB) return sortDirection === "asc" ? 1 : -1;
       return 0;
@@ -81,27 +76,33 @@ export default function FilterableTable({
     return sortedData.slice(start, start + pageSize);
   }, [sortedData, page, pageSize]);
 
-  const totalPages = Math.ceil(filteredData.length / pageSize);
+  const totalPages = Math.max(1, Math.ceil(filteredData.length / pageSize));
 
   return (
-    <div className={clsx("rounded shadow-md overflow-auto", tableWidth, className)}>
-      <table className="min-w-full table-auto">
+    <div className={clsx("overflow-x-auto max-w-full", tableWidth, className)}>
+      <table className="min-w-full table-auto border border-[--color-border] rounded-xl overflow-hidden shadow-sm">
         <thead>
           <tr>
             {columns.map((col, index) => (
               <th
                 key={index}
-                className="bg-[--color-primary] text-white font-bold border-y border-l last:border-r border-[--color-primary] px-4 py-2 text-center cursor-pointer select-none"
                 onClick={() => handleSort(col.accessor)}
+                className={clsx(
+                  "bg-[rgb(var(--color-primary-rgb),0.08)] text-[rgb(var(--color-primary-rgb))] font-medium px-4 py-2 text-sm cursor-pointer select-none transition",
+                  "border-x border-[--color-border] shadow-sm text-center",
+                  index === 0 && "first:rounded-tl-xl",
+                  index === columns.length - 1 && "last:rounded-tr-xl"
+                )}
               >
-                <div className="flex flex-col items-center w-full">
-                  <span className="mb-1 flex items-center gap-1">
+                <div className="flex flex-col items-center gap-1">
+                  <div className="flex items-center justify-center gap-1">
                     {col.header}
                     {sortBy === col.accessor && (
                       <span>{sortDirection === "asc" ? "↑" : "↓"}</span>
                     )}
-                  </span>
+                  </div>
 
+                  {/* Фильтры */}
                   {!col.noFilter && col.filterType === "select" && (
                     <ComboBox
                       placeholder="Все"
@@ -118,7 +119,7 @@ export default function FilterableTable({
                       type="date"
                       value={filters[col.accessor] || ""}
                       onChange={(e) => handleFilterChange(col.accessor, e.target.value)}
-                      className="text-black w-full"
+                      className="w-full text-[--color-text]"
                     />
                   )}
 
@@ -129,7 +130,7 @@ export default function FilterableTable({
                         placeholder="Фильтр..."
                         value={filters[col.accessor] || ""}
                         onChange={(e) => handleFilterChange(col.accessor, e.target.value)}
-                        className="p-1 rounded text-sm w-full text-black"
+                        className="p-1 rounded text-sm w-full text-[--color-text] border border-[--color-border] bg-white"
                       />
                     )}
                 </div>
@@ -138,20 +139,20 @@ export default function FilterableTable({
           </tr>
         </thead>
 
-        <tbody>
+        <tbody className="bg-[--color-block]">
           {paginatedData.map((row, rowIdx) => (
             <tr
               key={rowIdx}
-              className="transition cursor-pointer hover:bg-[--color-secondary]"
+              className="transition cursor-pointer hover:bg-[rgb(var(--color-secondary-rgb),0.5)]"
               onClick={() => onRowClick?.(row)}
             >
               {columns.map((col, colIdx) => (
                 <td
                   key={colIdx}
-                  className="border-y border-l last:border-r border-[--color-primary] text-[--color-primary] px-4 py-2 text-center break-words max-w-xs"
+                  className="border-t border-x border-[--color-border] text-[--color-text] text-sm px-4 py-2 text-center break-words max-w-xs whitespace-pre-line"
                 >
                   {typeof col.render === "function"
-                    ? col.render(row[col.accessor], row, rowIdx) // <-- теперь rowIdx доступен!
+                    ? col.render(row[col.accessor], row, rowIdx)
                     : row[col.accessor]}
                 </td>
               ))}
@@ -160,13 +161,27 @@ export default function FilterableTable({
         </tbody>
       </table>
 
+      {/* Пагинация */}
       {totalPages > 1 && (
-        <div className="flex justify-center items-center gap-2 py-2 bg-[--color-background] border-t border-[--color-border] text-[--color-primary] text-sm">
-          <button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page === 1} className="px-2">←</button>
+        <div className="flex justify-center items-center gap-3 py-3 text-[--color-primary] text-sm">
+          <button
+            className="px-3 py-1 rounded hover:bg-[--color-secondary]/10 disabled:opacity-50"
+            onClick={() => setPage((p) => Math.max(1, p - 1))}
+            disabled={page === 1}
+          >
+            ←
+          </button>
           <span>Страница {page} из {totalPages}</span>
-          <button onClick={() => setPage((p) => Math.min(totalPages, p + 1))} disabled={page === totalPages} className="px-2">→</button>
+          <button
+            className="px-3 py-1 rounded hover:bg-[--color-secondary]/10 disabled:opacity-50"
+            onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+            disabled={page === totalPages}
+          >
+            →
+          </button>
         </div>
       )}
     </div>
   );
 }
+

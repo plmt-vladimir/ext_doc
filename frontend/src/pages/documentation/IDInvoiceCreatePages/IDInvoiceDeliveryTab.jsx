@@ -1,6 +1,8 @@
 import FilterableTable from "@/components/widgets/FilterableTable";
 import Button from "@/components/UI/Button";
 import { useIDInvoice } from "./IDInvoiceContext";
+import GroupBox from "@/components/UI/GroupBox";
+import Label from "@/components/UI/Label";
 
 export default function IDInvoiceDeliveryTab() {
   const { deliveryData, setDeliveryData } = useIDInvoice();
@@ -14,10 +16,7 @@ export default function IDInvoiceDeliveryTab() {
   };
 
   return (
-    <div className="group-box border border-[--color-border] p-6 ">
-      <h3 className="group-box-title mb-4 text-lg font-semibold text-[--color-primary]">
-        Накладная на передачу ИД
-      </h3>
+    <GroupBox title="Накладная на передачу ИД"  bordered className="mb-4">
       <FilterableTable
         columns={[
           {
@@ -59,6 +58,6 @@ export default function IDInvoiceDeliveryTab() {
         <Button>Сохранить</Button>
         <Button>Сформировать</Button>
       </div>
-    </div>
+    </GroupBox>
   );
 }

@@ -5,8 +5,8 @@ export default function Input({
   onChange,
   placeholder,
   type = "text",
-  className = "",       // применяется к внешнему div
-  inputClassName = "",  // применяется к самому input
+  className = "",
+  inputClassName = "",
   variant = "default",
   error = false,
   disabled = false,
@@ -15,7 +15,7 @@ export default function Input({
   return (
     <div className={clsx("relative w-full", className)}>
       {icon && (
-        <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white pointer-events-none">
+        <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[--color-muted] pointer-events-none">
           {icon}
         </div>
       )}
@@ -27,17 +27,21 @@ export default function Input({
         placeholder={placeholder}
         disabled={disabled}
         className={clsx(
-          "w-full pl-3 pr-3 py-2 rounded border font-[Roboto] transition",
-          {
-            "bg-[--color-primary] text-white border-[--color-border]": variant === "default",
-            "bg-white text-black border-[--color-border]": variant === "white",
-            "pl-10": icon,
-            "opacity-50 cursor-not-allowed": disabled,
-            "border-red-500 ring-1 ring-red-500": error,
-          },
+          "w-full py-2 px-3 rounded-xl border text-[--color-text] font-[Roboto] shadow-sm transition duration-200 placeholder-[--color-muted]",
+          icon && "pl-10",
+          disabled && "opacity-50 cursor-not-allowed",
+          variant === "default" && "bg-[--color-block] border-[--color-border]",
+          variant === "white" && "bg-white border-[--color-border]",
+          error
+            ? "border-[--color-error] ring-1 ring-[--color-error]"
+            : "focus:outline-none focus:ring-2 focus:ring-[--color-primary] focus:border-[--color-primary]",
           inputClassName
         )}
       />
     </div>
   );
 }
+
+
+
+

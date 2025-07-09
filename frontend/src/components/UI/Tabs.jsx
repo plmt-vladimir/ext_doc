@@ -1,4 +1,5 @@
 import { useState } from "react";
+import clsx from "clsx";
 
 export default function Tabs({ tabs }) {
   const [active, setActive] = useState(0);
@@ -11,11 +12,12 @@ export default function Tabs({ tabs }) {
           <button
             key={index}
             onClick={() => setActive(index)}
-            className={`px-4 py-2 rounded-t text-sm font-semibold transition-colors duration-200 ${
+            className={clsx(
+              "px-4 py-2 text-sm font-semibold rounded-t-lg transition-all duration-200",
               active === index
-                ? "bg-[--color-secondary] text-white"
-                : "bg-[--color-background_menu] text-[--color-primary] hover:bg-[--color-secondary]/20"
-            }`}
+                ? "bg-[--color-secondary] text-white shadow-sm"
+                : "bg-[--color-background_menu] text-[--color-primary] hover:bg-[--color-secondary]/10"
+            )}
           >
             {tab.label}
           </button>
@@ -23,7 +25,7 @@ export default function Tabs({ tabs }) {
       </div>
 
       {/* Контент текущей вкладки */}
-      <div className="mt-4 w-full">
+      <div className="w-full">
         {tabs[active]?.component}
       </div>
     </div>

@@ -8,8 +8,8 @@ export default function ComboBox({
   placeholder = "Выберите...",
   className = "",
   size = "md",
-  value, // либо { value, label }, либо примитив (id)
-  allowFreeText = false 
+  value,
+  allowFreeText = false
 }) {
   const [inputValue, setInputValue] = useState("");
   const [filteredOptions, setFilteredOptions] = useState(options);
@@ -45,11 +45,9 @@ export default function ComboBox({
     }
   }, [value, options]);
 
-
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (containerRef.current && !containerRef.current.contains(e.target)) {
-
         if (
           allowFreeText &&
           inputValue &&
@@ -66,7 +64,7 @@ export default function ComboBox({
 
   const handleSelect = (option) => {
     setInputValue(option.label);
-    onChange?.(option); 
+    onChange?.(option);
     setIsOpen(false);
   };
 
@@ -81,7 +79,6 @@ export default function ComboBox({
       setHighlightIndex((prev) => (prev - 1 + filteredOptions.length) % filteredOptions.length);
     } else if (e.key === "Enter") {
       e.preventDefault();
-
       if (filteredOptions[highlightIndex]) {
         handleSelect(filteredOptions[highlightIndex]);
       } else if (allowFreeText && inputValue) {
@@ -109,11 +106,12 @@ export default function ComboBox({
         onFocus={() => setIsOpen(true)}
         onKeyDown={handleKeyDown}
         className={clsx(
-          "w-full rounded border border-[--color-border] text-[--color-primary] bg-white focus:outline-none",
+          "w-full rounded-xl border border-[--color-border] text-[--color-primary] bg-white font-[Roboto] shadow-sm",
+          "focus:outline-none focus:ring-2 focus:ring-[--color-primary] focus:border-[--color-primary]",
           sizeClasses[size]
         )}
         onBlur={() => {
-          setTimeout(() => { 
+          setTimeout(() => {
             if (
               allowFreeText &&
               inputValue &&
@@ -152,10 +150,4 @@ export default function ComboBox({
     </div>
   );
 }
-
-
-
-
-
-
 

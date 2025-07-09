@@ -6,6 +6,7 @@ import Button from "@/components/UI/Button";
 import FilterableTable from "@/components/widgets/FilterableTable";
 import { Pencil, Copy, Trash2 } from "lucide-react";
 import GroupBox from "@/components/UI/GroupBox";
+import Label from "@/components/UI/Label";
 
 export default function IDInvoiceList() {
   const [construction, setConstruction] = useState("");
@@ -45,18 +46,46 @@ export default function IDInvoiceList() {
   return (
     <PageWrapper title="Накладные и реестры исполнительной документации">
       <GroupBox title="Список документов" bordered>
-        <div className="grid grid-cols-12 gap-4 mb-4">
-          <div className="col-span-4">
-            <ComboBox placeholder="Стройка" options={[]} value={construction} onChange={setConstruction} />
+        {/* Фильтры: Стройка / Объект / Участок */}
+        <div className="grid grid-cols-12 gap-4 items-center mb-4">
+          {/* Стройка */}
+          <div className="col-span-4 flex items-center gap-2">
+            <Label className="whitespace-nowrap mb-0">Стройка</Label>
+            <ComboBox
+              placeholder="Стройка"
+              options={[]}
+              value={construction}
+              onChange={setConstruction}
+              className="w-full"
+            />
           </div>
-          <div className="col-span-4">
-            <ComboBox placeholder="Объект" options={[]} value={object} onChange={setObject} />
+
+          {/* Объект */}
+          <div className="col-span-4 flex items-center gap-2">
+            <Label className="whitespace-nowrap mb-0">Объект</Label>
+            <ComboBox
+              placeholder="Объект"
+              options={[]}
+              value={object}
+              onChange={setObject}
+              className="w-full"
+            />
           </div>
-          <div className="col-span-4">
-            <ComboBox placeholder="Участок" options={[]} value={section} onChange={setSection} />
+
+          {/* Участок */}
+          <div className="col-span-4 flex items-center gap-2">
+            <Label className="whitespace-nowrap mb-0">Участок</Label>
+            <ComboBox
+              placeholder="Участок"
+              options={[]}
+              value={section}
+              onChange={setSection}
+              className="w-full"
+            />
           </div>
         </div>
 
+        {/* Таблица */}
         <FilterableTable
           columns={[
             { header: "№ Документа", accessor: "id", filterType: "text" },
@@ -109,6 +138,7 @@ export default function IDInvoiceList() {
           <Button onClick={handleAdd}>Добавить</Button>
         </div>
       </GroupBox>
+
     </PageWrapper>
   );
 }

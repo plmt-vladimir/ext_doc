@@ -7,7 +7,7 @@ export default function Card({
   footer,
   onClick,
   className = "",
-  variant = "default", // default | white | outline
+  variant = "default", 
   width = "w-[250px]",
   height = "h-[300px]",
 }) {

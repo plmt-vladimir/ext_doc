@@ -18,29 +18,6 @@ export default function MaterialsStorage() {
 
   return (
     <PageWrapper title="Оприходование поступивших материалов">
-      {/* Принятые материалы */}
-      <GroupBox title="Принятые материалы" bordered>
-        <div className="grid grid-cols-4 gap-4 mb-4">
-          <ComboBox placeholder="Группа материалов" options={[]} />
-          <ComboBox placeholder="Единицы измерения" options={[]} />
-          <ComboBox placeholder="Наименование материала" options={[]} />
-          <div className="flex items-end gap-2">
-            <label className="text-xs text-[--color-primary] mb-1 block">Дата поступления</label>
-            <Input type="date" />
-          </div>
-        </div>
-      </GroupBox>
-
-      {/* Расход на объект */}
-      <GroupBox title="Расход на объект" bordered>
-        <div className="grid grid-cols-4 gap-4 items-end mb-4">
-          <ComboBox placeholder="Объект" options={[]} />
-          <Input placeholder="Бригада" />
-          <Input placeholder="Количество" />
-          <Button onClick={handleAddUsage}>Добавить</Button>
-        </div>
-      </GroupBox>
-
       {/* Расход по объектам */}
       <GroupBox title="Расход по объектам" bordered>
         <Table

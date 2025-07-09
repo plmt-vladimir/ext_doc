@@ -12,7 +12,6 @@ export const IDInvoiceProvider = ({ children }) => {
   const [includeIGS, setIncludeIGS] = useState(false);
   const [includeQualityDocs, setIncludeQualityDocs] = useState(false);
 
-  // Тестовые данные для табов (их тоже можно сюда, если нужен глобальный стейт)
   const [deliveryData, setDeliveryData] = useState([
     {
       id: 1,

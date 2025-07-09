@@ -4,10 +4,10 @@ export default function Text({ variant = "default", className = "", children }) 
   const base = "leading-snug";
 
   const variants = {
-    title: "text-3xl text-[--color-primary] font-[Onest] font-bold text-center tracking-wide",
-    subtitle: "text-xl text-[--color-primary] font-semibold font-[Onest] tracking-wide",
+    title: "text-3xl font-bold text-[--color-primary] text-center font-[Onest] tracking-tight",
+    subtitle: "text-xl font-semibold text-[--color-primary] font-[Onest] tracking-normal",
     default: "text-base text-[--color-text] font-[Roboto]",
-    muted: "text-sm text-gray-500 font-[Roboto]",
+    muted: "text-sm text-[--color-muted] font-[Roboto]",
   };
 
   return (

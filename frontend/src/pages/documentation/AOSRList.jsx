@@ -7,6 +7,7 @@ import Button from "@/components/UI/Button";
 import FilterableTable from "@/components/widgets/FilterableTable";
 import { Pencil, Copy, Trash2 } from "lucide-react";
 import GroupBox from "@/components/UI/GroupBox";
+import Label from "@/components/UI/Label";
 
 export default function AOSRList() {
   // Каскадные фильтры
@@ -136,7 +137,8 @@ export default function AOSRList() {
     { header: "Дата начала", accessor: "start_date", filterType: "date" },
     { header: "Дата окончания", accessor: "end_date", filterType: "date" },
     { header: "Дата подписания", accessor: "sign_date", filterType: "date" },
-    { header: "Статус", accessor: "status", filterType: "select",
+    {
+      header: "Статус", accessor: "status", filterType: "select",
       options: [
         { label: "Черновик", value: "Черновик" },
         { label: "Подписан", value: "Подписан" }
@@ -166,41 +168,51 @@ export default function AOSRList() {
 
   return (
     <PageWrapper title="Акты освидетельствования скрытых работ">
-      <GroupBox title="Акты освидетельствования скрытых работ" bordered>
-        <div className="grid grid-cols-12 gap-4 mb-4">
-          <div className="col-span-4">
+      <GroupBox title="Список АОСР" bordered>
+        {/* Стройка / Объект / Участок */}
+        <div className="grid grid-cols-12 gap-4 items-center mb-4">
+          {/* Стройка */}
+          <div className="col-span-4 flex items-center gap-2">
+            <Label className="whitespace-nowrap mb-0">Стройка</Label>
             <ComboBox
               placeholder="Стройка"
               options={constructions}
               value={construction}
               onChange={setConstruction}
+              className="w-full"
             />
           </div>
-          <div className="col-span-4">
+          {/* Объект */}
+          <div className="col-span-4 flex items-center gap-2">
+            <Label className="whitespace-nowrap mb-0">Объект</Label>
             <ComboBox
               placeholder="Объект"
               options={objects}
               value={object}
               onChange={setObject}
               isDisabled={!construction}
+              className="w-full"
             />
           </div>
-          <div className="col-span-4">
+          {/* Участок */}
+          <div className="col-span-4 flex items-center gap-2">
+            <Label className="whitespace-nowrap mb-0">Участок</Label>
             <ComboBox
               placeholder="Участок"
               options={sections}
               value={section}
               onChange={setSection}
               isDisabled={!object}
+              className="w-full"
             />
           </div>
         </div>
-
+        {/* Таблица */}
         <FilterableTable
           columns={columns}
           data={aosrList}
         />
-
+        {/* Кнопка */}
         <div className="flex justify-end mt-4">
           <Button onClick={handleAdd}>Добавить</Button>
         </div>

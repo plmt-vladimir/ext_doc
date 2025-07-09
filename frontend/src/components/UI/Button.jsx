@@ -5,18 +5,12 @@ export default function Button({
   onClick,
   type = "button",
   className = "",
-  variant = "primary", // primary | secondary | outline
-  size = "md",         // sm | md | lg
+  size = "md", // sm | md | lg
   disabled = false,
   loading = false,
 }) {
-  const baseClasses = "rounded-2xl font-[Onest] border transition text-white";
-
-  const variantClasses = {
-    primary: "bg-[--color-primary] border-[--color-border] hover:bg-[--color-secondary]",
-    secondary: "bg-[--color-secondary] border-[--color-border] hover:bg-[--color-primary]",
-    outline: "bg-transparent border-[--color-primary] text-[--color-primary] hover:bg-[--color-primary] hover:text-white",
-  };
+  const baseClasses =
+    "flex items-center justify-center gap-2 rounded-xl font-[Onest] font-semibold border transition duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-[--color-primary]";
 
   const sizeClasses = {
     sm: "px-3 py-1 text-sm",
@@ -31,7 +25,8 @@ export default function Button({
       disabled={disabled || loading}
       className={clsx(
         baseClasses,
-        variantClasses[variant],
+        
+        "bg-[--color-block] text-[--color-primary] border-[--color-primary] hover:bg-[rgb(var(--color-secondary-rgb),0.9)] shadow-sm",
         sizeClasses[size],
         disabled && "opacity-50 cursor-not-allowed",
         className
@@ -41,3 +36,5 @@ export default function Button({
     </button>
   );
 }
+
+

@@ -2,7 +2,7 @@ import clsx from "clsx";
 
 export default function ModalMessage({
   open,
-  mode = "notification", // "notification" или "confirmation"
+  mode = "notification", 
   title = "",
   message = "",
   onConfirm,
@@ -16,22 +16,25 @@ export default function ModalMessage({
       onClick={onCancel}
     >
       <div
-        className="bg-white rounded-2xl shadow-xl p-6 min-w-[320px] max-w-[90vw] border border-[--color-border]"
+        className="bg-white rounded-2xl shadow-xl p-6 sm:p-8 min-w-[320px] max-w-[90vw] border border-[--color-border] transition-all"
         onClick={(e) => e.stopPropagation()}
       >
         {title && (
-          <h2 className="text-lg font-semibold text-center text-[--color-primary] mb-4">
+          <h2 className="text-xl font-bold text-center text-[--color-primary] mb-4 leading-tight">
             {title}
           </h2>
         )}
-        <div className="text-[--color-primary] whitespace-pre-wrap text-center mb-6">
-          {message}
-        </div>
 
-        <div className="flex justify-center gap-4">
+        {message && (
+          <div className="text-center text-[--color-text] whitespace-pre-wrap mb-6 text-base">
+            {message}
+          </div>
+        )}
+
+        <div className={clsx("flex justify-center gap-4", mode === "confirmation" && "mt-4")}>
           {mode === "notification" && (
             <button
-              className="px-6 py-2 rounded-xl bg-[--color-secondary] text-white hover:bg-[--color-primary] shadow"
+              className="px-6 py-2 rounded-xl bg-[--color-secondary] text-white hover:bg-[--color-primary] transition shadow"
               onClick={onCancel}
             >
               ОК
@@ -41,13 +44,13 @@ export default function ModalMessage({
           {mode === "confirmation" && (
             <>
               <button
-                className="px-6 py-2 rounded-xl bg-gray-200 hover:bg-gray-300 text-gray-700"
+                className="px-6 py-2 rounded-xl bg-gray-200 text-gray-700 hover:bg-gray-300 transition"
                 onClick={onCancel}
               >
                 Отмена
               </button>
               <button
-                className="px-6 py-2 rounded-xl bg-[--color-secondary] text-white hover:bg-[--color-primary] shadow"
+                className="px-6 py-2 rounded-xl bg-[--color-secondary] text-white hover:bg-[--color-primary] transition shadow"
                 onClick={onConfirm}
               >
                 Подтвердить
@@ -59,3 +62,4 @@ export default function ModalMessage({
     </div>
   );
 }
+

@@ -7,6 +7,7 @@ import { Pencil, Copy, Trash2 } from "lucide-react";
 import useCascadeConstruction from "@/hooks/useCascadeConstruction";
 import { useEffect, useState } from "react";
 import GroupBox from "@/components/UI/GroupBox";
+import Label from "@/components/UI/Label";
 
 // Определи роли
 const ROLES = [
@@ -161,43 +162,54 @@ export default function AOOKList() {
   return (
     <PageWrapper title="Акты освидетельствования ответственных конструкций">
       <GroupBox title="Акты освидетельствования ответственных конструкций" bordered>
-        <div className="grid grid-cols-12 gap-4 mb-4">
-          <div className="col-span-4">
+        {/* Стройка / Объект / Участок */}
+        <div className="grid grid-cols-12 gap-4 items-center mb-4">
+          {/* Стройка */}
+          <div className="col-span-4 flex items-center gap-2">
+            <Label className="whitespace-nowrap mb-0">Стройка</Label>
             <ComboBox
               placeholder="Стройка"
               options={constructions}
               value={construction}
               onChange={setConstruction}
+              className="w-full"
             />
           </div>
-          <div className="col-span-4">
+          {/* Объект */}
+          <div className="col-span-4 flex items-center gap-2">
+            <Label className="whitespace-nowrap mb-0">Объект</Label>
             <ComboBox
               placeholder="Объект"
               options={objects}
               value={object}
               onChange={setObject}
               disabled={!construction}
+              className="w-full"
             />
           </div>
-          <div className="col-span-4">
+          {/* Участок */}
+          <div className="col-span-4 flex items-center gap-2">
+            <Label className="whitespace-nowrap mb-0">Участок</Label>
             <ComboBox
               placeholder="Участок"
               options={zones}
               value={zone}
               onChange={setZone}
               disabled={!object}
+              className="w-full"
             />
           </div>
         </div>
-
+        {/* Таблица */}
         <FilterableTable columns={columns} data={aookList} />
-
+        {/* Кнопка */}
         <div className="flex justify-end mt-4">
           <Button onClick={handleAdd}>Добавить</Button>
         </div>
       </GroupBox>
     </PageWrapper>
   );
+
 }
 
 

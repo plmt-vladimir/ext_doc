@@ -5,6 +5,7 @@ import EditableTable from "@/components/widgets/EditableTable";
 import ModalMessage from "@/components/UI/ModalMessage";
 import api from "@/api/axios";
 import GroupBox from "@/components/UI/Groupbox";
+import Label from "@/components/UI/Label";
 
 export default function CommonRegistry() {
   const [construction, setConstruction] = useState(null);
@@ -122,9 +123,9 @@ export default function CommonRegistry() {
         };
 
         if (row.id) {
-          await api.put(`/projects/sections/${row.id}`, payload); 
+          await api.put(`/projects/sections/${row.id}`, payload);
         } else {
-          await api.post(`/projects/sections`, payload); 
+          await api.post(`/projects/sections`, payload);
         }
       }
 
@@ -140,24 +141,33 @@ export default function CommonRegistry() {
   return (
     <PageWrapper title="Общий реестр (по объектам)">
       <GroupBox bordered className="border border-[--color-border] p-4 mb-4" title="Объект">
-        <div className="grid grid-cols-6 gap-4">
-          <ComboBox
-            placeholder="Стройка"
-            options={sites}
-            value={construction}
-            onChange={(val) => {
-              setConstruction(val);
-              setObject(null);
-            }}
-            className="col-span-2"
-          />
-          <ComboBox
-            placeholder="Объект"
-            options={objects}
-            value={object}
-            onChange={(val) => setObject(val)}
-            className="col-span-2"
-          />
+        <div className="grid grid-cols-6 gap-x-4 items-center">
+          {/* Стройка */}
+          <div className="col-span-3 flex items-center gap-2">
+            <Label className="whitespace-nowrap mb-0">Стройка</Label>
+            <ComboBox
+              placeholder="Стройка"
+              options={sites}
+              value={construction}
+              onChange={(val) => {
+                setConstruction(val);
+                setObject(null);
+              }}
+              className="w-full"
+            />
+          </div>
+
+          {/* Объект */}
+          <div className="col-span-3 flex items-center gap-2">
+            <Label className="whitespace-nowrap mb-0">Объект</Label>
+            <ComboBox
+              placeholder="Объект"
+              options={objects}
+              value={object}
+              onChange={(val) => setObject(val)}
+              className="w-full"
+            />
+          </div>
         </div>
       </GroupBox>
 

@@ -8,6 +8,7 @@ import { Trash2 } from "lucide-react";
 import { useObjectRegistration } from "./ObjectRegistrationContext";
 import api from "@/api/axios";
 import GroupBox from "@/components/UI/GroupBox";
+import Label from "@/components/UI/Label";
 
 export default function CustomerCard() {
   const {
@@ -156,7 +157,7 @@ export default function CustomerCard() {
   ];
 
   return (
-    <PageWrapper title="Карточка заказчика">
+    <PageWrapper>
       <div className="grid grid-cols-7 gap-4">
         <div className="col-span-3">
           <ComboBox
@@ -167,35 +168,103 @@ export default function CustomerCard() {
           />
         </div>
         <div className="col-span-4" />
-
         <GroupBox className="col-span-2" title="Организация" bordered>
-          <div className="grid grid-cols-1 gap-4 mb-4">
-            <Input placeholder="Наименование" value={orgFullName} onChange={(e) => updateField("orgFullName", e.target.value)} />
-            <Input placeholder="ОГРН" value={ogrn} onChange={(e) => updateField("ogrn", e.target.value)} />
-            <Input placeholder="ИНН" value={inn} onChange={(e) => updateField("inn", e.target.value)} />
-            <Input placeholder="Адрес" value={address} onChange={(e) => updateField("address", e.target.value)} />
-            <Input placeholder="Тел/факс" value={telFax} onChange={(e) => updateField("telFax", e.target.value)} />
-            <Input placeholder="Наименование свидетельства" value={certificateName} onChange={(e) => updateField("certificateName", e.target.value)} />
-            <Input placeholder="Номер свидетельства" value={certificateNumber} onChange={(e) => updateField("certificateNumber", e.target.value)} />
-            <Input placeholder="Дата выдачи" value={issueDate} onChange={(e) => updateField("issueDate", e.target.value)} type="date" />
-            <Input placeholder="Наименование СРО" value={sroName} onChange={(e) => updateField("sroName", e.target.value)} />
-            <Input placeholder="Номер СРО" value={sroNumber} onChange={(e) => updateField("sroNumber", e.target.value)} />
-            <Input placeholder="СРО ОГРН" value={sroOgrn} onChange={(e) => updateField("sroOgrn", e.target.value)} />
-            <Input placeholder="СРО ИНН" value={sroInn} onChange={(e) => updateField("sroInn", e.target.value)} />
+          <div className="flex flex-col gap-3 mb-4">
+            {[
+              { id: "orgFullName", label: "Наименование", value: orgFullName },
+              { id: "ogrn", label: "ОГРН", value: ogrn },
+              { id: "inn", label: "ИНН", value: inn },
+              { id: "address", label: "Адрес", value: address },
+              { id: "telFax", label: "Тел/факс", value: telFax },
+              { id: "certificateName", label: "Наименование свидетельства", value: certificateName },
+              { id: "certificateNumber", label: "Номер свидетельства", value: certificateNumber },
+              { id: "issueDate", label: "Дата выдачи", value: issueDate, type: "date" },
+              { id: "sroName", label: "Наименование СРО", value: sroName },
+              { id: "sroNumber", label: "Номер СРО", value: sroNumber },
+              { id: "sroOgrn", label: "СРО ОГРН", value: sroOgrn },
+              { id: "sroInn", label: "СРО ИНН", value: sroInn },
+            ].map(({ id, label, value, type }) => (
+              <div key={id} className="flex items-center gap-4">
+                <Label htmlFor={id} className="w-1/4 text-sm text-[--color-primary]">
+                  {label}
+                </Label>
+                <div className="w-3/4">
+                  <Input
+                    id={id}
+                    type={type || "text"}
+                    placeholder={label}
+                    value={value}
+                    onChange={(e) => updateField(id, e.target.value)}
+                  />
+                </div>
+              </div>
+            ))}
           </div>
         </GroupBox>
-
         <GroupBox className="col-span-5" title="Ответственное лицо" bordered>
           <div className="grid grid-cols-3 gap-4 mb-4">
-            <Input placeholder="Ф.И.О." value={full_name} onChange={(e) => updateField("full_name", e.target.value)} />
-            <Input placeholder="ИНС" value={ins} onChange={(e) => updateField("ins", e.target.value)} />
-            <Input placeholder="Должность" value={position} onChange={(e) => updateField("position", e.target.value)} />
+            {/* Ф.И.О. */}
+            <div className="flex flex-col">
+              <Label htmlFor="full_name" className="text-[--color-primary]">Ф.И.О.</Label>
+              <Input
+                id="full_name"
+                placeholder="Ф.И.О."
+                value={full_name}
+                onChange={(e) => updateField("full_name", e.target.value)}
+              />
+            </div>
+
+            {/* ИНС */}
+            <div className="flex flex-col">
+              <Label htmlFor="ins" className="text-[--color-primary]">ИНС</Label>
+              <Input
+                id="ins"
+                placeholder="ИНС"
+                value={ins}
+                onChange={(e) => updateField("ins", e.target.value)}
+              />
+            </div>
+
+            {/* Должность */}
+            <div className="flex flex-col">
+              <Label htmlFor="position" className="text-[--color-primary]">Должность</Label>
+              <Input
+                id="position"
+                placeholder="Должность"
+                value={position}
+                onChange={(e) => updateField("position", e.target.value)}
+              />
+            </div>
           </div>
 
-          <div className="grid grid-cols-3 gap-4 mb-4">
-            <Input placeholder="Приказ №" value={decree_number} onChange={(e) => updateField("decree_number", e.target.value)} />
-            <Input placeholder="Дата приказа" value={decree_date} onChange={(e) => updateField("decree_date", e.target.value)} type="date" />
-            <Button onClick={handleAddEmployee}>Добавить</Button>
+          <div className="grid grid-cols-3 gap-4 mb-4 items-end">
+            {/* Приказ № */}
+            <div className="flex flex-col">
+              <Label htmlFor="decree_number" className="text-[--color-primary]">Приказ №</Label>
+              <Input
+                id="decree_number"
+                placeholder="Приказ №"
+                value={decree_number}
+                onChange={(e) => updateField("decree_number", e.target.value)}
+              />
+            </div>
+
+            {/* Дата приказа */}
+            <div className="flex flex-col">
+              <Label htmlFor="decree_date" className="text-[--color-primary]">Дата приказа</Label>
+              <Input
+                id="decree_date"
+                type="date"
+                placeholder="Дата приказа"
+                value={decree_date}
+                onChange={(e) => updateField("decree_date", e.target.value)}
+              />
+            </div>
+
+            {/* Кнопка */}
+            <div className="flex flex-col">
+              <Button onClick={handleAddEmployee}>Добавить</Button>
+            </div>
           </div>
 
           <FilterableTable
@@ -203,6 +272,7 @@ export default function CustomerCard() {
             data={customerCard.employees}
           />
         </GroupBox>
+
       </div>
     </PageWrapper>
   );

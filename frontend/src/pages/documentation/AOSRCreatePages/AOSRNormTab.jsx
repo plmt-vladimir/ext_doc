@@ -7,6 +7,7 @@ import ComboBox from "@/components/UI/ComboBox";
 import Select from "react-select";
 import { useEffect, useMemo } from "react";
 import { useAOSRCreate } from "./AOSRCreateContext";
+import Label from "@/components/UI/Label";
 
 function buildPresentation(data) {
   let rowStr = [data.section, data.code, data.sheets].filter(Boolean).join(", ");
@@ -87,95 +88,118 @@ export default function AOSRNormTab({ projectSections, spOptions }) {
 
   const renderDocSection = (title, data, sectionKey) => (
     <GroupBox bordered className="w-full" title={title}>
+      {/* Первая строка: Раздел проекта / Шифр / Листы */}
       <div className="grid grid-cols-3 gap-4 mb-2">
-        <ComboBox
-          placeholder="Раздел проекта"
-          options={projectSections}
-          value={data.section ? projectSections.find(s => s.data.section_code === data.section) : null}
-          onChange={(selected) => {
-            setNorm(prev => ({
+        <div className="flex flex-col">
+          <label className="text-sm text-[--color-primary] mb-1">Раздел проекта</label>
+          <ComboBox
+            placeholder="Раздел проекта"
+            options={projectSections}
+            value={data.section ? projectSections.find(s => s.data.section_code === data.section) : null}
+            onChange={(selected) => {
+              setNorm(prev => ({
+                ...prev,
+                [sectionKey]: {
+                  ...prev[sectionKey],
+                  section: selected?.data.section_code || "",
+                  code: selected?.data.section_name || "",
+                  sheets: selected?.data.sheet_info || "",
+                  fullName: selected?.data.discipline || "",
+                  org: selected?.data.designer || ""
+                }
+              }));
+            }}
+          />
+        </div>
+        <div className="flex flex-col">
+          <label className="text-sm text-[--color-primary] mb-1">Шифр раздела</label>
+          <Input
+            placeholder="Шифр раздела"
+            value={data.code}
+            onChange={e => setNorm(prev => ({
               ...prev,
-              [sectionKey]: {
-                ...prev[sectionKey],
-                section: selected?.data.section_code || "",
-                code: selected?.data.section_name || "",
-                sheets: selected?.data.sheet_info || "",
-                fullName: selected?.data.discipline || "",
-                org: selected?.data.designer || ""
-              }
-            }));
-          }}
-        />
-        <Input
-          placeholder="Шифр раздела"
-          value={data.code}
+              [sectionKey]: { ...prev[sectionKey], code: e.target.value }
+            }))}
+          />
+        </div>
+        <div className="flex flex-col">
+          <label className="text-sm text-[--color-primary] mb-1">Листы</label>
+          <Input
+            placeholder="Листы"
+            value={data.sheets}
+            onChange={e => setNorm(prev => ({
+              ...prev,
+              [sectionKey]: { ...prev[sectionKey], sheets: e.target.value }
+            }))}
+          />
+        </div>
+      </div>
+
+      {/* Полное название */}
+      <div className="flex flex-col mb-2">
+        <label className="text-sm text-[--color-primary] mb-1">Полное название</label>
+        <Textarea
+          placeholder="Полное название"
+          value={data.fullName}
+          rows={1}
           onChange={e => setNorm(prev => ({
             ...prev,
-            [sectionKey]: { ...prev[sectionKey], code: e.target.value }
-          }))}
-        />
-        <Input
-          placeholder="Листы"
-          value={data.sheets}
-          onChange={e => setNorm(prev => ({
-            ...prev,
-            [sectionKey]: { ...prev[sectionKey], sheets: e.target.value }
+            [sectionKey]: { ...prev[sectionKey], fullName: e.target.value }
           }))}
         />
       </div>
-      <Textarea
-        placeholder="Полное название"
-        value={data.fullName}
-        onChange={e => setNorm(prev => ({
-          ...prev,
-          [sectionKey]: { ...prev[sectionKey], fullName: e.target.value }
-        }))}
-        className="mb-2"
-      />
-      <Input
-        placeholder="Проектная организация"
-        value={data.org}
-        onChange={e => setNorm(prev => ({
-          ...prev,
-          [sectionKey]: { ...prev[sectionKey], org: e.target.value }
-        }))}
-        className="mb-2"
-      />
-      <Textarea
-        placeholder="Представление в документе"
-        value={data.presentation}
-        readOnly
-        className="mb-2"
-      />
-      <div className="flex gap-2 items-center mb-2">
-        <Select
-          options={spOptions}
-          isMulti
-          placeholder="Нормативные документы и СП"
-          value={data.norms}
-          onChange={v => setNorm(prev => ({
-            ...prev,
-            [sectionKey]: { ...prev[sectionKey], norms: v }
-          }))}
-          className="text-sm text-black w-full"
-          classNamePrefix="react-select"
-        />
-        <FormField
-          type="checkbox"
-          label="Исполнительный реестр"
-          checked={data.exec}
+
+      {/* Проектная организация */}
+      <div className="flex flex-col mb-2">
+        <label className="text-sm text-[--color-primary] mb-1">Проектная организация</label>
+        <Input
+          placeholder="Проектная организация"
+          value={data.org}
           onChange={e => setNorm(prev => ({
             ...prev,
-            [sectionKey]: { ...prev[sectionKey], exec: e.target.checked }
+            [sectionKey]: { ...prev[sectionKey], org: e.target.value }
           }))}
         />
       </div>
-      <Textarea
-        placeholder="Представление в документе с указанием СП"
-        value={data.presentationWithNorms}
-        readOnly
-      />
+      {/* Нормативные документы и чекбокс */}
+      <div className="flex flex-col mb-2">
+        <label className="text-sm text-[--color-primary] mb-1">Нормативные документы и СП</label>
+        <div className="flex gap-2 items-center">
+          <Select
+            options={spOptions}
+            isMulti
+            placeholder="Нормативные документы и СП"
+            value={data.norms}
+            onChange={v => setNorm(prev => ({
+              ...prev,
+              [sectionKey]: { ...prev[sectionKey], norms: v }
+            }))}
+            className="text-sm text-black w-full"
+            classNamePrefix="react-select"
+          />
+          <FormField
+            type="checkbox"
+            label="Исполнительный реестр"
+            checked={data.exec}
+            onChange={e => setNorm(prev => ({
+              ...prev,
+              [sectionKey]: { ...prev[sectionKey], exec: e.target.checked }
+            }))}
+          />
+        </div>
+      </div>
+
+      {/* Представление в документе с указанием СП */}
+      <div className="flex flex-col">
+        <label className="text-sm text-[--color-primary] mb-1">Представление в документе с указанием СП</label>
+        <Textarea
+          placeholder="Представление в документе с указанием СП"
+          value={data.presentationWithNorms}
+          readOnly
+        />
+      </div>
     </GroupBox>
+
   );
 
   return (
@@ -191,13 +215,6 @@ export default function AOSRNormTab({ projectSections, spOptions }) {
         value={combinedPresentation}
         readOnly
       />
-      <Textarea
-        placeholder="Представление в документе с указанием СП"
-        className="h-24"
-        value={combinedPresentationWithNorms}
-        readOnly
-      />
-
       <div className="flex justify-end gap-4">
         <Button onClick={handleClear}>Очистить</Button>
       </div>

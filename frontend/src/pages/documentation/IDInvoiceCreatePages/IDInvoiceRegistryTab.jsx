@@ -15,10 +15,7 @@ export default function IDInvoiceRegistryTab() {
   };
 
   return (
-    <div className="group-box border border-[--color-border] p-6 ">
-      <h3 className="group-box-title mb-4 text-lg font-semibold text-[--color-primary]">
-        Реестр исполнительной документации
-      </h3>
+    <GroupBox title="Реестр исполнительной документации"  bordered className="mb-4">
       <FilterableTable
         columns={[
           {
@@ -53,6 +50,6 @@ export default function IDInvoiceRegistryTab() {
         <Button>Сохранить</Button>
         <Button>Сформировать</Button>
       </div>
-    </div>
+    </GroupBox>
   );
 }

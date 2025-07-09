@@ -9,7 +9,7 @@ export default function Table({
   centered = true,
   className = "",
   tableWidth = "w-full",
-  pageSize, // ← новый проп для включения пагинации
+  pageSize,
 }) {
   const normalizedHeaders = headers.map((h, i) =>
     typeof h === "string" ? { label: h, accessor: i } : h
@@ -26,7 +26,7 @@ export default function Table({
       setSortBy(accessor);
       setSortDirection("asc");
     }
-    setPage(1); // сброс при сортировке
+    setPage(1);
   };
 
   const sortedRows = useMemo(() => {
@@ -56,7 +56,7 @@ export default function Table({
     <div className="overflow-x-auto max-w-full">
       <table
         className={clsx(
-          "min-w-full table-auto border border-[--color-primary] rounded overflow-hidden shadow-md",
+          "min-w-full table-auto border border-[--color-border] rounded-xl overflow-hidden shadow-sm",
           tableWidth,
           className
         )}
@@ -68,8 +68,11 @@ export default function Table({
                 key={index}
                 onClick={() => handleSort(col.accessor)}
                 className={clsx(
-                  "bg-[--color-primary] text-white font-bold border border-[--color-primary] px-4 py-2 cursor-pointer select-none",
-                  centered && "text-center"
+                  "bg-[rgb(var(--color-primary-rgb),0.08)] text-[rgb(var(--color-primary-rgb))] font-medium px-4 py-2 text-sm cursor-pointer select-none transition",
+                  "border-x border-[--color-border] shadow-sm",
+                  centered && "text-center",
+                  index === 0 && "first:rounded-tl-xl",
+                  index === normalizedHeaders.length - 1 && "last:rounded-tr-xl"
                 )}
               >
                 <div className="flex items-center justify-center gap-1">
@@ -82,14 +85,14 @@ export default function Table({
             ))}
           </tr>
         </thead>
-        <tbody>
+        <tbody className="bg-[--color-block]">
           {paginatedRows.map((row, rowIndex) => (
             <tr
               key={rowIndex}
               className={clsx(
-                "border-b border-[--color-primary] transition cursor-pointer",
+                "transition cursor-pointer",
                 striped && rowIndex % 2 === 1 && "bg-[--color-background]",
-                "hover:bg-[--color-secondary]"
+                "hover:bg-[rgb(var(--color-secondary-rgb),0.5)]"
               )}
               onClick={() => onRowClick?.(row, rowIndex)}
             >
@@ -101,9 +104,9 @@ export default function Table({
                   <td
                     key={colIndex}
                     className={clsx(
-                      "border border-[--color-primary] text-[--color-primary] px-4 py-2",
+                      "text-[--color-text] text-sm px-4 py-2 border-t border-x border-[--color-border]",
                       centered && "text-center",
-                      "break-words max-w-xs  whitespace-pre-line"
+                      "break-words max-w-xs whitespace-pre-line"
                     )}
                   >
                     {cell}
@@ -115,20 +118,25 @@ export default function Table({
         </tbody>
       </table>
 
-      {/* Пагинация (если включена) */}
       {pageSize && totalPages > 1 && (
-        <div className="flex justify-center items-center gap-2 py-2 text-[--color-primary] text-sm">
-          <button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page === 1}>
+        <div className="flex justify-center items-center gap-3 py-3 text-[--color-primary] text-sm">
+          <button
+            className="px-3 py-1 rounded hover:bg-[--color-secondary]/10 disabled:opacity-50"
+            onClick={() => setPage((p) => Math.max(1, p - 1))}
+            disabled={page === 1}
+          >
             ←
           </button>
           <span>Страница {page} из {totalPages}</span>
-          <button onClick={() => setPage((p) => Math.min(totalPages, p + 1))} disabled={page === totalPages}>
+          <button
+            className="px-3 py-1 rounded hover:bg-[--color-secondary]/10 disabled:opacity-50"
+            onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+            disabled={page === totalPages}
+          >
             →
           </button>
         </div>
       )}
     </div>
   );
-}
-
-
+} 

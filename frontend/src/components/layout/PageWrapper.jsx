@@ -9,14 +9,14 @@ export default function PageWrapper({
   actions = null,
   children,
   className = "",
-  maxWidth = null, // теперь по умолчанию нет ограничений
+  maxWidth = null,
 }) {
   return (
     <div className={clsx("group-box h-full flex flex-col", className)}>
       {/* Заголовок страницы */}
       <div className="flex justify-between items-center mb-4 flex-wrap">
         <div className="flex flex-col gap-1">
-          {title && <Label text={title} />}
+          <Label weight="bold">{title}</Label>
           {description && (
             <p className="text-sm text-[--color-primary]/80 font-[Roboto]">
               {description}

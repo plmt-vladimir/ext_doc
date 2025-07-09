@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import clsx from "clsx";
 
 export default function Textarea({ value, onChange, placeholder, className = "", rows }) {
   const textareaRef = useRef();
@@ -17,9 +18,13 @@ export default function Textarea({ value, onChange, placeholder, className = "",
       onChange={onChange}
       placeholder={placeholder}
       rows={rows}
-      className={`w-full p-2 rounded border border-[--color-border] bg-white text-[--color-primary] resize-y font-[Roboto] ${
-        rows ? "" : "min-h-[6rem] max-h-[20vh]"
-      } ${className}`}
+      className={clsx(
+        "w-full px-3 py-2 rounded-xl border font-[Roboto] shadow-sm transition duration-200",
+        "text-[--color-text] bg-[--color-block] border-[--color-border]",
+        "focus:outline-none focus:ring-2 focus:ring-[--color-primary] focus:border-[--color-primary]",
+        rows ? "" : "min-h-[6rem] max-h-[20vh]",
+        className
+      )}
     />
   );
 }

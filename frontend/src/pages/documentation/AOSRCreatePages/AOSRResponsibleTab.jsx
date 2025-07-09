@@ -27,8 +27,11 @@ const ROLE_ID_BY_KEY = {
 function ResponsiblePersonBlock({ title, value, onChange, options }) {
   return (
     <GroupBox title={<span className="text-sm font-semibold ">{title}</span>} bordered className="w-full">
-      <div className="flex flex-col gap-3 pt-4">
+      <div className="grid grid-cols-5 gap-3 pt-4 items-center">
+        {/* Ф.И.О. */}
+        <label className="col-span-1 text-sm text-[--color-primary]">Ф.И.О.</label>
         <ComboBox
+          className="col-span-4"
           placeholder="Ф.И.О."
           options={options}
           value={value.id || ""}
@@ -48,23 +51,35 @@ function ResponsiblePersonBlock({ title, value, onChange, options }) {
             }
           }}
         />
+        {/* Номер приказа */}
+        <label className="col-span-1 text-sm text-[--color-primary]">Номер приказа</label>
         <Input
+          className="col-span-4"
           placeholder="Номер приказа"
           value={value.order}
           onChange={e => onChange({ ...value, order: e.target.value })}
         />
+        {/* Дата приказа */}
+        <label className="col-span-1 text-sm text-[--color-primary]">Дата приказа</label>
         <Input
           type="date"
+          className="col-span-4"
           placeholder="Дата приказа"
           value={value.date}
           onChange={e => onChange({ ...value, date: e.target.value })}
         />
+        {/* Должность */}
+        <label className="col-span-1 text-sm text-[--color-primary]">Должность</label>
         <Input
+          className="col-span-4"
           placeholder="Должность"
           value={value.position}
           onChange={e => onChange({ ...value, position: e.target.value })}
         />
+        {/* Организация */}
+        <label className="col-span-1 text-sm text-[--color-primary]">Организация</label>
         <Input
+          className="col-span-4"
           placeholder="Организация"
           value={value.organization}
           onChange={e => onChange({ ...value, organization: e.target.value })}

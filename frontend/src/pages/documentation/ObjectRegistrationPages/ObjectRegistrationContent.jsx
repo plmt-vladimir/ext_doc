@@ -212,7 +212,7 @@ export default function ObjectRegistrationContent() {
 
 
   return (
-    <PageWrapper title="Регистрация объекта">
+    <PageWrapper title="Регистрация строительства">
       <Tabs tabs={tabs} />
       <div className="mt-6 flex justify-end">
         <Button onClick={handleGlobalSaveClick}>Сохранить</Button>

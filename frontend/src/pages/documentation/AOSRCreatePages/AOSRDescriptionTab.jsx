@@ -4,6 +4,7 @@ import Textarea from "@/components/UI/Textarea";
 import FormField from "@/components/UI/FormField";
 import ComboBox from "@/components/UI/ComboBox";
 import { useAOSRCreate } from "./AOSRCreateContext";
+import Label from "@/components/UI/Label";
 
 const defaultDescription = {
   startDate: "",
@@ -63,7 +64,7 @@ export default function AOSRDescriptionTab({ registryOptions }) {
 
   return (
     <div className="flex flex-col gap-6">
-      {/* Даты */}
+      {/* Блок дат */}
       <div className="grid grid-cols-6 gap-4">
         <div className="flex flex-col col-span-2">
           <label className="text-sm text-[--color-primary]">Дата начала работ:</label>
@@ -91,67 +92,69 @@ export default function AOSRDescriptionTab({ registryOptions }) {
         </div>
       </div>
 
-      {/* Основной блок: левая и правая колонки */}
-      <div className="grid grid-cols-5 gap-4">
-        {/* Левая колонка */}
-        <div className="col-span-2 flex flex-col gap-3">
+      {/* Блок ввода информации */}
+      <div className="grid grid-cols-12 gap-4">
+        {/* Левая часть: 7 колонок */}
+        <div className="col-span-8 flex flex-col gap-3">
           {/* Код участка */}
-          <div className="flex items-center gap-2">
+          <div className="grid grid-cols-7 items-center gap-2">
+            <Label className="col-span-1">Код участка</Label>
             <Input
+              className="col-span-4"
               placeholder="Код участка"
               value={description.codeSection}
               onChange={(e) => setDescription((d) => ({ ...d, codeSection: e.target.value }))}
-              className="w-full"
             />
             <FormField
+              className="col-span-1"
               type="checkbox"
               label="Вставить в название"
               checked={description.insertCodeSection}
-              onChange={(e) =>
-                setDescription((d) => ({ ...d, insertCodeSection: e.target.checked }))
-              }
+              onChange={(e) => setDescription((d) => ({ ...d, insertCodeSection: e.target.checked }))}
             />
           </div>
 
           {/* Оси */}
-          <div className="flex items-center gap-2">
+          <div className="grid grid-cols-7 items-center gap-2">
+            <Label className="col-span-1">Оси</Label>
             <Input
+              className="col-span-4"
               placeholder="Оси в которых выполнена конструкция"
               value={description.axes}
               onChange={(e) => setDescription((d) => ({ ...d, axes: e.target.value }))}
-              className="w-full"
             />
             <FormField
+              className="col-span-1"
               type="checkbox"
               label="Вставить в название"
               checked={description.insertAxes}
-              onChange={(e) =>
-                setDescription((d) => ({ ...d, insertAxes: e.target.checked }))
-              }
+              onChange={(e) => setDescription((d) => ({ ...d, insertAxes: e.target.checked }))}
             />
           </div>
 
           {/* Отметки */}
-          <div className="flex items-center gap-2">
+          <div className="grid grid-cols-7 items-center gap-2">
+            <Label className="col-span-1">Отметки</Label>
             <Input
+              className="col-span-4"
               placeholder="Отметки"
               value={description.marks}
               onChange={(e) => setDescription((d) => ({ ...d, marks: e.target.value }))}
-              className="w-full"
             />
             <FormField
+              className="col-span-1"
               type="checkbox"
               label="Вставить в название"
               checked={description.insertMarks}
-              onChange={(e) =>
-                setDescription((d) => ({ ...d, insertMarks: e.target.checked }))
-              }
+              onChange={(e) => setDescription((d) => ({ ...d, insertMarks: e.target.checked }))}
             />
           </div>
 
-          {/* Код в АООК + Код реестра */}
-          <div className="grid grid-cols-2 gap-2">
+          {/* Код в АООК и Код реестра */}
+          <div className="grid grid-cols-10 items-center gap-2">
+            <Label className="col-span-1">Код в АООК</Label>
             <Input
+              className="col-span-4"
               placeholder="Код в АООК"
               value={description.selectors?.[2]?.value || ""}
               onChange={(e) =>
@@ -163,7 +166,9 @@ export default function AOSRDescriptionTab({ registryOptions }) {
                 }))
               }
             />
+            <Label className="col-span-1">Код реестра</Label>
             <ComboBox
+              className="col-span-4"
               placeholder="Код реестра"
               options={registryOptions}
               value={description.registryCode}
@@ -172,42 +177,37 @@ export default function AOSRDescriptionTab({ registryOptions }) {
           </div>
         </div>
 
-        {/* Правая колонка */}
-        <div className="col-span-3">
+        <div className="col-span-4 flex flex-col h-full">
+          <Label className="mb-1">Дополнительные сведения</Label>
           <Textarea
+            className="h-full"
             placeholder="Дополнительные сведения"
+            rows={4}
             value={description.additionalInfo}
             onChange={(e) => setDescription((d) => ({ ...d, additionalInfo: e.target.value }))}
-            className="h-full"
           />
         </div>
       </div>
 
-      {/* === Новый блок: две TextArea на всю ширину === */}
       <div className="grid grid-cols-2 gap-4">
         <div className="flex flex-col gap-1">
-          <label className="text-sm text-[--color-primary]">
-            К освидетельствованию предъявлены следующие работы:
-          </label>
+          <Label>К освидетельствованию предъявлены следующие работы:</Label>
           <Textarea
             placeholder="..."
             value={description.worksText}
-            onChange={(e) => setDescription(d => ({ ...d, worksText: e.target.value }))}
-            className="..."
+            onChange={(e) => setDescription((d) => ({ ...d, worksText: e.target.value }))}
           />
         </div>
-
         <div className="flex flex-col gap-1">
-          <label className="text-sm text-[--color-primary]">Последующие работы:</label>
+          <Label>Последующие работы:</Label>
           <Textarea
             placeholder="Опишите последующие работы"
             value={description.nextWorksText}
-            onChange={(e) =>
-              setDescription((d) => ({ ...d, nextWorksText: e.target.value }))
-            }
+            onChange={(e) => setDescription((d) => ({ ...d, nextWorksText: e.target.value }))}
           />
         </div>
       </div>
     </div>
+
   );
 }

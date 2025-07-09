@@ -1,13 +1,14 @@
 import PageWrapper from "@/components/layout/PageWrapper";
 import ComboBox from "@/components/UI/ComboBox";
 import Button from "@/components/UI/Button";
+import GroupBox from "@/components/UI/Groupbox";
+import Label from "@/components/UI/Label";
 import Tabs from "@/components/UI/Tabs";
 import MultiSelectComboBox from "@/components/UI/MultiSelectComboBox";
 import { IDInvoiceProvider, useIDInvoice } from "./IDInvoiceContext";
 import IDInvoiceDeliveryTab from "./IDInvoiceDeliveryTab";
 import IDInvoiceRegistryTab from "./IDInvoiceRegistryTab";
 
-// Вся логика и интерфейс формы
 function IDInvoiceCreateContent() {
   const {
     construction, setConstruction,
@@ -27,77 +28,99 @@ function IDInvoiceCreateContent() {
 
   return (
     <PageWrapper title="Создание накладной на передачу ИД заказчику">
-      <div className="group-box border border-[--color-border] mb-4">
-        <h3 className="group-box-title mb-4">Настройка формирования</h3>
-        <div className="grid grid-cols-8 gap-4 mb-4">
-          <ComboBox
-            placeholder="Стройка"
-            options={[]}
-            value={construction}
-            onChange={setConstruction}
-            className="col-span-2"
-          />
-          <ComboBox
-            placeholder="Объект"
-            options={[]}
-            value={object}
-            onChange={setObject}
-            className="col-span-2"
-          />
-          <ComboBox
-            placeholder="Участок"
-            options={[]}
-            value={section}
-            onChange={setSection}
-            className="col-span-2"
-          />
-          <MultiSelectComboBox
-            placeholder="Пункт(ы) реестра"
-            options={[
-              { label: "Пункт 1", value: "Пункт 1" },
-              { label: "Пункт 2", value: "Пункт 2" },
-              { label: "Пункт 3", value: "Пункт 3" }
-            ]}
-            value={registerPoints}
-            onChange={setRegisterPoints}
-            className="col-span-2"
-          />
-        </div>
-        <div className="grid grid-cols-10 gap-4 items-center">
-          <label className="col-span-2 flex items-center gap-2 text-[--color-primary]">
-            <input type="checkbox" checked={includeIGS} onChange={() => setIncludeIGS(!includeIGS)} />
-            ИГС и лабораторные испытания
-          </label>
-          <label className="col-span-2 flex items-center gap-2 text-[--color-primary]">
-            <input type="checkbox" checked={includeQualityDocs} onChange={() => setIncludeQualityDocs(!includeQualityDocs)} />
-            Документы качества
-          </label>
-          <MultiSelectComboBox
-            placeholder="АООК"
-            options={[
-              { label: "АООК №1", value: "АООК №1" },
-              { label: "АООК №2", value: "АООК №2" },
-              { label: "АООК №3", value: "АООК №3" }
-            ]}
-            value={selectedAooks}
-            onChange={setSelectedAooks}
-            className="col-span-3"
-          />
-          <ComboBox
-            placeholder="Статус АОСР"
-            options={[
-              { label: "Черновик", value: "Черновик" },
-              { label: "Подписан", value: "Подписан" },
-              { label: "Отклонён", value: "Отклонён" }
-            ]}
-            value={status}
-            onChange={setStatus}
-            className="col-span-3"
-          />
-        </div>
+<GroupBox title="Настройка формирования" bordered className="mb-4">
+  {/* Первая строка */}
+  <div className="grid grid-cols-12 gap-x-2 gap-y-4 mb-4">
+    <Label className="col-span-1 text-sm text-[--color-primary] text-right self-center">Стройка</Label>
+    <ComboBox
+      className="col-span-3"
+      placeholder="Стройка"
+      options={[]}
+      value={construction}
+      onChange={setConstruction}
+    />
+
+    <Label className="col-span-1 text-sm text-[--color-primary] text-right self-center">Объект</Label>
+    <ComboBox
+      className="col-span-3"
+      placeholder="Объект"
+      options={[]}
+      value={object}
+      onChange={setObject}
+    />
+
+    <Label className="col-span-1 text-sm text-[--color-primary] text-right self-center">Участок</Label>
+    <ComboBox
+      className="col-span-3"
+      placeholder="Участок"
+      options={[]}
+      value={section}
+      onChange={setSection}
+    />
+  </div>
+
+  {/* Вторая строка */}
+  <div className="grid grid-cols-12 gap-x-2 gap-y-4 items-center">
+    <Label className="col-span-1 text-sm text-right text-[--color-primary]">Пункт(ы) реестра</Label>
+    <MultiSelectComboBox
+      className="col-span-3"
+      placeholder="Пункт(ы) реестра"
+      options={[
+        { label: "Пункт 1", value: "Пункт 1" },
+        { label: "Пункт 2", value: "Пункт 2" },
+        { label: "Пункт 3", value: "Пункт 3" }
+      ]}
+      value={registerPoints}
+      onChange={setRegisterPoints}
+    />
+
+    <Label className="col-span-1 text-sm text-right text-[--color-primary]">АООК</Label>
+    <MultiSelectComboBox
+      className="col-span-3"
+      placeholder="АООК"
+      options={[
+        { label: "АООК №1", value: "АООК №1" },
+        { label: "АООК №2", value: "АООК №2" },
+        { label: "АООК №3", value: "АООК №3" }
+      ]}
+      value={selectedAooks}
+      onChange={setSelectedAooks}
+    />
+
+    <div className="col-span-4 flex gap-6">
+      <div className="flex items-center gap-2">
+        <input
+          type="checkbox"
+          id="include-igs"
+          checked={includeIGS}
+          onChange={() => setIncludeIGS(!includeIGS)}
+        />
+        <Label htmlFor="include-igs" className="text-sm text-[--color-primary]">
+          ИГС и испытания
+        </Label>
       </div>
+
+      <div className="flex items-center gap-2">
+        <input
+          type="checkbox"
+          id="include-quality"
+          checked={includeQualityDocs}
+          onChange={() => setIncludeQualityDocs(!includeQualityDocs)}
+        />
+        <Label htmlFor="include-quality" className="text-sm text-[--color-primary]">
+          Документы качества
+        </Label>
+      </div>
+    </div>
+  </div>
+</GroupBox>
+
+
+
+
       <Tabs tabs={tabs} />
     </PageWrapper>
+
   );
 }
 
