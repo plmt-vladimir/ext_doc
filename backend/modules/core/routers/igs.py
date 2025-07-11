@@ -8,23 +8,29 @@ import os
 from modules.core.models.igs_labtest import IGS
 from common.database import get_async_session
 from modules.core.schemas.igs import IgsSchema, IgsOut
+from common.minio_client import upload_file_to_minio, delete_file_from_minio
+from fastapi.responses import RedirectResponse
+from common.minio_client import get_presigned_url
 
 router = APIRouter(prefix="/igs", tags=["IGS"])
 
-# Папка для загрузки PDF-файлов
-UPLOAD_DIR = Path("data/igs")
-
+# Открытие по пресайнду файла
+@router.get("/files/{object_path:path}")
+async def get_file(object_path: str):
+    url = get_presigned_url(object_path)
+    return RedirectResponse(url)
 # Загрузка файла ИГС (PDF) 
 @router.post("/upload")
 async def upload_igs_file(file: UploadFile = File(...)):
-    ext = file.filename.split('.')[-1]
-    unique_name = f"{uuid4()}.{ext}"
-    file_path = UPLOAD_DIR / unique_name
+    ext = Path(file.filename or "").suffix.lower().lstrip(".")
+    if ext != "pdf":
+        raise HTTPException(status_code=400, detail="Только PDF разрешены")
 
-    with open(file_path, "wb") as f:
-        f.write(await file.read())
+    file_bytes = await file.read()
+    filename = file.filename or "igs.pdf"
+    object_name = upload_file_to_minio(file_bytes, filename, folder="igs")
 
-    return {"file_url": f"/files/igs/{unique_name}"}
+    return {"file_url": object_name}
 
 
 # Создание новой ИГС
@@ -65,12 +71,8 @@ async def delete_igs(igs_id: int, session: AsyncSession = Depends(get_async_sess
     if not igs:
         raise HTTPException(status_code=404, detail="ИГС не найдена")
 
-    file_path = Path(UPLOAD_DIR / Path(igs.file_url).name)
-    if file_path.exists():
-        try:
-            file_path.unlink()
-        except Exception as e:
-            raise HTTPException(status_code=500, detail=f"Не удалось удалить файл: {e}")
+    if igs.file_url:
+        delete_file_from_minio(igs.file_url)
 
     await session.delete(igs)
     await session.commit()
@@ -86,16 +88,9 @@ async def update_igs(igs_id: int, data: IgsSchema, session: AsyncSession = Depen
     if not igs:
         raise HTTPException(status_code=404, detail="ИГС не найдена")
 
-    # Удаление старого файла, если имя изменилось
     if igs.file_url != data.file_url:
-        old_path = Path(UPLOAD_DIR / Path(igs.file_url).name)
-        if old_path.exists():
-            try:
-                old_path.unlink()
-            except Exception as e:
-                raise HTTPException(status_code=500, detail=f"Не удалось удалить старый файл: {e}")
+        delete_file_from_minio(igs.file_url)
 
-    # Обновление полей
     for field, value in data.dict().items():
         setattr(igs, field, value)
 

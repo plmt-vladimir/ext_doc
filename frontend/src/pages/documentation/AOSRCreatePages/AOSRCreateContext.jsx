@@ -43,12 +43,12 @@ const defaultNorm = {
 };
 
 const defaultEmployeeOptions = {
-  zakazchik: [],
-  stroitel: [],
-  stroitelKontrol: [],
-  proektirovshik: [],
-  raboty: [],
-  inyeLitsa: [],
+  customer: [],
+  generalContractor: [],
+  contractor: [],
+  projectOrg: [],
+  constructionControl: [],
+  inyeLitsa: []
 };
 
 const defaultMaterials = {
@@ -74,11 +74,11 @@ const initialPerson = {
 };
 
 const defaultResponsible = {
-  zakazchik: { ...initialPerson },
-  stroitel: { ...initialPerson },
-  stroitelKontrol: { ...initialPerson },
-  proektirovshik: { ...initialPerson },
-  raboty: { ...initialPerson },
+  customer: { ...initialPerson },
+  generalContractor: { ...initialPerson },
+  contractor: { ...initialPerson },
+  projectOrg: { ...initialPerson },
+  constructionControl: { ...initialPerson },
   inyeLitsa: { ...initialPerson },
 };
 

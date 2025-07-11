@@ -3,7 +3,9 @@ from uuid import uuid4
 from typing import List, Optional
 from datetime import datetime
 from sqlalchemy.orm import joinedload
-
+from common.minio_client import upload_file_to_minio, delete_file_from_minio
+from fastapi.responses import RedirectResponse
+from common.minio_client import get_presigned_url
 from fastapi import (
     APIRouter, Depends, Query, UploadFile, File, HTTPException, Form, Request
 )
@@ -25,23 +27,32 @@ from modules.core.schemas.materials import (
 
 router = APIRouter(prefix="/deliveries", tags=["Materials"])
 
-#  Папка для хранения накладных и сертификатов 
-DELIVERY_UPLOAD_DIR = FilePath("data/invoices")
-QUALITY_UPLOAD_DIR = FilePath("data/quality_docs")
-DELIVERY_UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
-QUALITY_UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
+# Открытие по пресайнду файла накладной 
+@router.get("/invoices/view/{delivery_id}")
+async def view_invoice_file(delivery_id: int, db: AsyncSession = Depends(get_async_session)):
+    delivery = await db.get(Delivery, delivery_id)
+    if not delivery or not delivery.invoice_file_url:
+        raise HTTPException(404, detail="Файл не найден")
+    
+    return RedirectResponse(get_presigned_url(delivery.invoice_file_url))
+# Открытие по пресайнду файла документа о качестве
+@router.get("/quality-documents/view/{doc_id}")
+async def view_quality_doc(doc_id: int, db: AsyncSession = Depends(get_async_session)):
+    doc = await db.get(QualityDocument, doc_id)
+    if not doc:
+        raise HTTPException(404, detail="Документ не найден")
 
+    return RedirectResponse(get_presigned_url(doc.file_url))
 #Загрузка PDF накладной
 @router.post("/upload-invoice")
 async def upload_invoice_file(file: UploadFile = File(...)):
-    ext = file.filename.split('.')[-1]
-    unique_name = f"{uuid4()}.{ext}"
-    file_path = DELIVERY_UPLOAD_DIR / unique_name
+    filename = file.filename or ""
+    if not filename.lower().endswith(".pdf"):
+        raise HTTPException(400, detail="Только PDF разрешены")
 
-    with open(file_path, "wb") as f:
-        f.write(await file.read())
-
-    return {"file_url": f"/files/invoices/{unique_name}"}
+    file_bytes = await file.read()
+    object_name = upload_file_to_minio(file_bytes, filename, folder="invoices")
+    return {"file_url": object_name}
 # Загрузка PDF документа о качестве
 @router.post("/upload-quality-doc")
 async def upload_quality_document(
@@ -52,27 +63,27 @@ async def upload_quality_document(
     expiry_date: str = Form(...),
     db: AsyncSession = Depends(get_async_session)
 ):
-    ext = file.filename.split('.')[-1]
-    unique_name = f"{uuid4()}.{ext}"
-    file_path = QUALITY_UPLOAD_DIR / unique_name
+    filename = file.filename or ""
+    if not filename.lower().endswith(".pdf"):
+        raise HTTPException(400, detail="Только PDF разрешены")
 
-    with open(file_path, "wb") as f:
-        f.write(await file.read())
-    # Преобразуем строки в date
     try:
         issue_date_parsed = datetime.strptime(issue_date, "%Y-%m-%d").date()
         expiry_date_parsed = datetime.strptime(expiry_date, "%Y-%m-%d").date()
     except Exception as e:
-        print("Ошибка преобразования дат:", e)
-        raise HTTPException(400, f"Неверный формат даты: {e}")
+        raise HTTPException(400, detail=f"Неверный формат даты: {e}")
+
+    file_bytes = await file.read()
+    object_name = upload_file_to_minio(file_bytes, filename, folder="quality_docs")
 
     doc = QualityDocument(
         type=type,
         number=number,
         issue_date=issue_date_parsed,
         expiry_date=expiry_date_parsed,
-        file_url=f"/files/quality_docs/{unique_name}"
+        file_url=object_name
     )
+
     db.add(doc)
     await db.commit()
     await db.refresh(doc)
@@ -212,12 +223,9 @@ async def update_quality_document(
         doc.expiry_date = datetime.strptime(expiry_date, '%Y-%m-%d').date()
 
     if file and file.filename:
-        ext = file.filename.split('.')[-1]
-        unique_name = f"{uuid4()}.{ext}"
-        file_path = QUALITY_UPLOAD_DIR / unique_name
-        with open(file_path, "wb") as f:
-            f.write(await file.read())
-        doc.file_url = f"/files/quality_docs/{unique_name}"
+        file_bytes = await file.read()
+        object_name = upload_file_to_minio(file_bytes, file.filename, folder="quality_docs")
+        doc.file_url = object_name
     else:
         raise HTTPException(status_code=400, detail="File must be provided")
 
@@ -235,7 +243,7 @@ async def get_suppliers(
         query = query.where(Delivery.site_id == site_id)
     result = await db.execute(query)
     return [row[0] for row in result.fetchall() if row[0]]
-#  Получение доступных материалов по объекту/участку 
+#  Получение доступных материалов стройке (опционально по объекту/участку)
 @router.get("/available", response_model=List[DeliveredMaterialOut])
 async def get_available_materials(
     site_id: int = Query(..., description="ID стройки (site_id)"),

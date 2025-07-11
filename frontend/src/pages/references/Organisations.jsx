@@ -50,7 +50,7 @@ function mapEmpToForm(emp) {
     id: emp.id,
     name: emp.full_name,
     position: emp.position || "",
-    role: emp.ins || "",
+    ins: emp.ins || "",
     order: emp.decree_number || "",
     date: emp.decree_date || "",
   };
@@ -60,7 +60,7 @@ function mapFormToApiEmp(form) {
   return {
     full_name: form.name,
     position: form.position,
-    ins: form.role,
+    ins: form.ins,
     decree_number: form.order,
     decree_date: form.date,
   };
@@ -330,11 +330,11 @@ export default function Contractors() {
             <Button onClick={handleAddEmployee}>Добавить</Button>
           </div>
           <Table
-            headers={["ФИО", "Должность", "Роль", "Номер приказа", "Дата приказа", ""]}
+            headers={["ФИО", "Должность", "ИНС", "Номер приказа", "Дата приказа", ""]}
             rows={(employees[selectedOrgId] || []).map((emp) => [
               emp.name,
               emp.position,
-              emp.role,
+              emp.ins,
               emp.order,
               emp.date,
               <div className="flex justify-center gap-2 text-[--color-primary]">
@@ -351,7 +351,7 @@ export default function Contractors() {
               <div className="grid grid-cols-2 gap-4 mb-4">
                 <Input placeholder="ФИО" value={editingEmployee.name} onChange={(e) => setEditingEmployee({ ...editingEmployee, name: e.target.value })} />
                 <Input placeholder="Должность" value={editingEmployee.position} onChange={(e) => setEditingEmployee({ ...editingEmployee, position: e.target.value })} />
-                <Input placeholder="Роль" value={editingEmployee.role} onChange={(e) => setEditingEmployee({ ...editingEmployee, role: e.target.value })} />
+                <Input placeholder="ИНС" value={editingEmployee.ins} onChange={(e) => setEditingEmployee({ ...editingEmployee, ins: e.target.value })} />
                 <Input placeholder="Номер приказа" value={editingEmployee.order} onChange={(e) => setEditingEmployee({ ...editingEmployee, order: e.target.value })} />
                 <Input type="date" placeholder="Дата приказа" value={editingEmployee.date} onChange={(e) => setEditingEmployee({ ...editingEmployee, date: e.target.value })} />
               </div>

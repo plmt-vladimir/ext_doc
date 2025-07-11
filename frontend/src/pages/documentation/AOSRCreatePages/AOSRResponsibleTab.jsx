@@ -7,24 +7,34 @@ import { useAOSRCreate } from "./AOSRCreateContext";
 import api from "@/api/axios";
 
 const roleKeys = [
-  "zakazchik",
-  "stroitel",
-  "stroitelKontrol",
-  "proektirovshik",
-  "raboty",
+  "customer",
+  "generalContractor",
+  "contractor",
+  "projectOrg",
+  "constructionControl",
   "inyeLitsa"
 ];
 
 const ROLE_ID_BY_KEY = {
-  zakazchik: 1,
-  stroitel: 3,
-  stroitelKontrol: 5,
-  proektirovshik: 4,
-  raboty: 6,
-  inyeLitsa: 7,
+  customer: 1,
+  generalContractor: 2,
+  contractor: 3,
+  projectOrg: 4,
+  constructionControl: 5,
+  inyeLitsa: 6
 };
 
 function ResponsiblePersonBlock({ title, value, onChange, options }) {
+  const safeValue = value || {
+    id: "",
+    name: "",
+    order: "",
+    date: "",
+    position: "",
+    organization: ""
+  };
+  console.log("value = ", safeValue);
+  console.log("options = ", options);
   return (
     <GroupBox title={<span className="text-sm font-semibold ">{title}</span>} bordered className="w-full">
       <div className="grid grid-cols-5 gap-3 pt-4 items-center">
@@ -33,18 +43,18 @@ function ResponsiblePersonBlock({ title, value, onChange, options }) {
         <ComboBox
           className="col-span-4"
           placeholder="Ф.И.О."
-          options={options}
-          value={value.id || ""}
-          onChange={val => {
-            const selected = options.find(opt => opt.value === val);
-            if (selected && selected.employee) {
+          options={options || []}
+          value={safeValue.id}
+          onChange={(option) => {
+            if (option?.employee) {
+              const emp = option.employee;
               onChange({
-                id: selected.employee.id,
-                name: selected.employee.full_name,
-                order: selected.employee.decree_number || "",
-                date: selected.employee.decree_date || "",
-                position: selected.employee.position || "",
-                organization: selected.employee.organization_name || "",
+                id: emp.id,
+                name: emp.full_name || "",
+                order: emp.decree_number || "",
+                date: emp.decree_date || "",
+                position: emp.position || "",
+                organization: emp.organization || ""
               });
             } else {
               onChange({ id: "", name: "", order: "", date: "", position: "", organization: "" });
@@ -56,38 +66,43 @@ function ResponsiblePersonBlock({ title, value, onChange, options }) {
         <Input
           className="col-span-4"
           placeholder="Номер приказа"
-          value={value.order}
-          onChange={e => onChange({ ...value, order: e.target.value })}
+          disabled
+          value={safeValue.order}
+          onChange={e => onChange({ ...safeValue, order: e.target.value })}
         />
         {/* Дата приказа */}
         <label className="col-span-1 text-sm text-[--color-primary]">Дата приказа</label>
         <Input
+          disabled
           type="date"
           className="col-span-4"
           placeholder="Дата приказа"
-          value={value.date}
-          onChange={e => onChange({ ...value, date: e.target.value })}
+          value={safeValue.date}
+          onChange={e => onChange({ ...safeValue, date: e.target.value })}
         />
         {/* Должность */}
         <label className="col-span-1 text-sm text-[--color-primary]">Должность</label>
         <Input
+          disabled
           className="col-span-4"
           placeholder="Должность"
-          value={value.position}
-          onChange={e => onChange({ ...value, position: e.target.value })}
+          value={safeValue.position}
+          onChange={e => onChange({ ...safeValue, position: e.target.value })}
         />
         {/* Организация */}
         <label className="col-span-1 text-sm text-[--color-primary]">Организация</label>
         <Input
+          disabled
           className="col-span-4"
           placeholder="Организация"
-          value={value.organization}
-          onChange={e => onChange({ ...value, organization: e.target.value })}
+          value={safeValue.organization}
+          onChange={e => onChange({ ...safeValue, organization: e.target.value })}
         />
       </div>
     </GroupBox>
   );
 }
+
 
 
 export default function AOSRResponsibleTab() {
@@ -96,11 +111,11 @@ export default function AOSRResponsibleTab() {
   useEffect(() => {
     if (!common.construction) {
       setEmployeeOptions({
-        zakazchik: [],
-        stroitel: [],
-        stroitelKontrol: [],
-        proektirovshik: [],
-        raboty: [],
+        customer: [],
+        generalContractor: [],
+        contractor: [],
+        projectOrg: [],
+        constructionControl: [],
         inyeLitsa: [],
       });
       return;
@@ -110,10 +125,12 @@ export default function AOSRResponsibleTab() {
       const roleAssignments = await api.get("/organizations/role-assignments/", {
         params: { construction_site_id: common.construction }
       });
+
       const roleOrgMap = {};
       for (const ra of roleAssignments.data) {
         roleOrgMap[ra.role_id] = ra.organization_id;
       }
+
       const newOptions = {};
       for (const roleKey of roleKeys) {
         const roleId = ROLE_ID_BY_KEY[roleKey];
@@ -122,13 +139,25 @@ export default function AOSRResponsibleTab() {
           newOptions[roleKey] = [];
           continue;
         }
+
+        // Получаем название организации:
+        const orgRes = await api.get(`/organizations/${orgId}`);
+        const orgName = orgRes.data.name;
+
+        // Загружаем сотрудников:
         const empsRes = await api.get(`/organizations/${orgId}/employees`);
+
+        // Добавляем organization в каждый employee:
         newOptions[roleKey] = empsRes.data.map(emp => ({
           label: emp.full_name,
           value: emp.id,
-          employee: emp
+          employee: {
+            ...emp,
+            organization: orgName,
+          }
         }));
       }
+
       setEmployeeOptions(newOptions);
     };
 
@@ -142,11 +171,11 @@ export default function AOSRResponsibleTab() {
 
   const handleClear = () => {
     setResponsible({
-      zakazchik: { name: "", order: "", date: "", position: "", organization: "" },
-      stroitel: { name: "", order: "", date: "", position: "", organization: "" },
-      stroitelKontrol: { name: "", order: "", date: "", position: "", organization: "" },
-      proektirovshik: { name: "", order: "", date: "", position: "", organization: "" },
-      raboty: { name: "", order: "", date: "", position: "", organization: "" },
+      customer: { name: "", order: "", date: "", position: "", organization: "" },
+      generalContractor: { name: "", order: "", date: "", position: "", organization: "" },
+      contractor: { name: "", order: "", date: "", position: "", organization: "" },
+      projectOrg: { name: "", order: "", date: "", position: "", organization: "" },
+      constructionControl: { name: "", order: "", date: "", position: "", organization: "" },
       inyeLitsa: { name: "", order: "", date: "", position: "", organization: "" },
     });
   };
@@ -156,33 +185,33 @@ export default function AOSRResponsibleTab() {
       <div className="grid grid-cols-3 gap-4">
         <ResponsiblePersonBlock
           title="Представитель заказчика или технического заказчика по вопросам строительного контроля"
-          value={responsible.zakazchik}
-          onChange={(val) => updateField("zakazchik", val)}
-          options={employeeOptions.zakazchik}
+          value={responsible.customer}
+          onChange={(val) => updateField("customer", val)}
+          options={employeeOptions.customer}
         />
         <ResponsiblePersonBlock
           title="Представитель лица, осуществляющего строительство"
-          value={responsible.stroitel}
-          onChange={(val) => updateField("stroitel", val)}
-          options={employeeOptions.stroitel}
+          value={responsible.generalContractor}
+          onChange={(val) => updateField("generalContractor", val)}
+          options={employeeOptions.generalContractor}
         />
         <ResponsiblePersonBlock
           title="Представитель лица, осуществляющего строительство, по вопросам строительного контроля"
-          value={responsible.stroitelKontrol}
-          onChange={(val) => updateField("stroitelKontrol", val)}
-          options={employeeOptions.stroitelKontrol}
+          value={responsible.constructionControl}
+          onChange={(val) => updateField("constructionControl", val)}
+          options={employeeOptions.constructionControl}
         />
         <ResponsiblePersonBlock
           title="Представитель лица, осуществляющего подготовку проектной документации, в случаях, когда авторский надзор осуществляется"
-          value={responsible.proektirovshik}
-          onChange={(val) => updateField("proektirovshik", val)}
-          options={employeeOptions.proektirovshik}
+          value={responsible.projectOrg}
+          onChange={(val) => updateField("projectOrg", val)}
+          options={employeeOptions.projectOrg}
         />
         <ResponsiblePersonBlock
           title="Представитель лица, выполняющего работы, подлежащие освидетельствованию"
-          value={responsible.raboty}
-          onChange={(val) => updateField("raboty", val)}
-          options={employeeOptions.raboty}
+          value={responsible.contractor}
+          onChange={(val) => updateField("contractor", val)}
+          options={employeeOptions.contractor}
         />
         <ResponsiblePersonBlock
           title="Представитель иных лиц, участвующих в освидетельствовании"

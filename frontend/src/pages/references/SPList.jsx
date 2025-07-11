@@ -6,7 +6,7 @@ import Button from "@/components/UI/Button";
 import Input from "@/components/UI/Input";
 import GroupBox from "@/components/UI/Groupbox";
 import { Pencil, Trash2, Upload } from "lucide-react";
-import ModalMessage from "@/components/UI/ModalMessage"; 
+import ModalMessage from "@/components/UI/ModalMessage";
 
 function Modal({ isOpen, onClose, title, children }) {
   if (!isOpen) return null;
@@ -163,7 +163,7 @@ export default function SPList() {
         val
           ? (
             <a
-              href={`${import.meta.env.VITE_REACT_APP_API_URL}${val}`}
+              href={`${import.meta.env.VITE_REACT_APP_API_URL}/sp/files/${val}`}
               target="_blank"
               rel="noopener noreferrer"
               className="text-[--color-primary] underline"
@@ -223,6 +223,16 @@ export default function SPList() {
                 className="w-full"
                 placeholder="Файл не выбран"
               />
+              {formData.pdf_url && (
+                <a
+                  href={`${import.meta.env.VITE_REACT_APP_API_URL}/sp/files/${formData.pdf_url}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm text-blue-600 underline mt-1 block"
+                >
+                  Открыть текущий файл
+                </a>
+              )}
               <input
                 type="file"
                 accept="application/pdf"

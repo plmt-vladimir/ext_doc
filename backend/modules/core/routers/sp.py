@@ -1,16 +1,21 @@
 from fastapi import APIRouter, UploadFile, File, HTTPException, Depends
+from fastapi.responses import RedirectResponse
+from common.minio_client import get_presigned_url
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from pathlib import Path
-import shutil
-from uuid import uuid4
 from modules.core.models.sp import SP
 from modules.core.schemas.sp import SPCreate, SPOut, SPUpdate
 from common.database import get_async_session
+from common.minio_client import upload_file_to_minio, delete_file_from_minio
 
 router = APIRouter(prefix="/sp", tags=["SP"])
-UPLOAD_DIR = Path("data/sp")
-UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
+
+@router.get("/files/{object_path:path}")
+async def get_file(object_path: str):
+    url = get_presigned_url(object_path)
+    return RedirectResponse(url)
+
 
 @router.get("/", response_model=list[SPOut])
 async def list_sp(session: AsyncSession = Depends(get_async_session)):
@@ -41,17 +46,24 @@ async def delete_sp(sp_id: int, session: AsyncSession = Depends(get_async_sessio
     sp = await session.get(SP, sp_id)
     if not sp:
         raise HTTPException(404, "SP not found")
+
+    # Удалить файл, если есть
+    if sp.pdf_url:
+        delete_file_from_minio(sp.pdf_url)
+
     await session.delete(sp)
     await session.commit()
     return {"ok": True}
 
+
 @router.post("/upload", response_model=dict)
 async def upload_sp_pdf(file: UploadFile = File(...)):
-    ext = file.filename.split(".")[-1].lower()
+    ext = Path(file.filename or "").suffix.lower().lstrip(".")
     if ext != "pdf":
-        raise HTTPException(400, "Только PDF")
-    unique_name = f"{uuid4()}.{ext}"
-    file_path = UPLOAD_DIR / unique_name
-    with open(file_path, "wb") as f:
-        shutil.copyfileobj(file.file, f)
-    return {"file_url": f"/files/sp/{unique_name}"}
+        raise HTTPException(status_code=400, detail="Только PDF разрешены")
+
+    file_bytes = await file.read()
+    filename = file.filename or "default_filename"
+    object_name = upload_file_to_minio(file_bytes, filename, folder="sp")
+
+    return {"file_url": object_name}

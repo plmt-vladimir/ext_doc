@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import api from "@/api/axios";
 import GroupBox from "@/components/UI/Groupbox";
-import Textarea from "@/components/UI/Textarea";
 import Button from "@/components/UI/Button";
 import FilterableTable from "@/components/widgets/FilterableTable";
 import Table from "@/components/widgets/Table";
@@ -59,7 +58,7 @@ export default function AOSRDocsTab() {
       header: "Файл", accessor: "file_url", filterType: null,
       render: (_, row) => (
         <a
-          href={`${import.meta.env.VITE_REACT_APP_API_URL}${row.file_url}`}
+          href={`${import.meta.env.VITE_REACT_APP_API_URL}/igs/files/${row.file_url}`}
           target="_blank"
           rel="noopener noreferrer"
           className="text-blue-600 hover:underline"
@@ -87,7 +86,7 @@ export default function AOSRDocsTab() {
       header: "Файл", accessor: "file_url", filterType: null,
       render: (_, row) => (
         <a
-          href={`${import.meta.env.VITE_REACT_APP_API_URL}${row.file_url}`}
+          href={`${import.meta.env.VITE_REACT_APP_API_URL}/labtests/files/${row.file_url}`}
           target="_blank"
           rel="noopener noreferrer"
           className="text-blue-600 hover:underline"
@@ -131,7 +130,7 @@ export default function AOSRDocsTab() {
     item.marks,
     item.date,
     <a
-      href={`${import.meta.env.VITE_REACT_APP_API_URL}${item.file_url}`}
+      href={`${import.meta.env.VITE_REACT_APP_API_URL}/igs/files/${item.file_url}`}
       target="_blank"
       rel="noopener noreferrer"
       className="text-blue-600 hover:underline"
@@ -149,7 +148,7 @@ export default function AOSRDocsTab() {
     item.marks,
     item.date,
     <a
-      href={`${import.meta.env.VITE_REACT_APP_API_URL}${item.file_url}`}
+      href={`${import.meta.env.VITE_REACT_APP_API_URL}/labtests/files/${item.file_url}`}
       target="_blank"
       rel="noopener noreferrer"
       className="text-blue-600 hover:underline"

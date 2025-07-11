@@ -171,19 +171,19 @@ export default function LabTestList() {
   };
 
   const headers = [
-    "ID стройки", "ID объекта", "ID участка", "Протокол", "В осях", "Отметки", "Дата", "Файл", ""
+    "Стройка", "Объект", "Участок", "Протокол", "В осях", "Отметки", "Дата", "Файл", ""
   ];
 
   const rows = tests.map((item, idx) => [
-    item.site_id,
-    item.object_id || "-",
-    item.zone_id || "-",
+    constructions.find(c => c.value === item.site_id)?.label || item.site_id,
+    objects.find(o => o.value === item.object_id)?.label || "-",
+    sections.find(z => z.value === item.zone_id)?.label || "-",
     item.title,
     item.axes,
     item.marks,
     item.date,
     <a
-      href={`${import.meta.env.VITE_REACT_APP_API_URL}${item.file_url}`}
+      href={`${import.meta.env.VITE_REACT_APP_API_URL}/labtests/files/${item.file_url}`}
       target="_blank"
       rel="noopener noreferrer"
       className="text-blue-600 hover:underline"
@@ -248,6 +248,16 @@ export default function LabTestList() {
                 </Button>
                 <span className="text-sm text-gray-600 truncate">{fileName || "Файл не выбран"}</span>
               </div>
+              {filePath && typeof filePath === "string" && (
+                <a
+                  href={`${import.meta.env.VITE_REACT_APP_API_URL}/labtests/files/${filePath}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm text-blue-600 underline mt-1"
+                >
+                  Открыть текущий файл
+                </a>
+              )}
             </div>
   
             <div className="col-span-2 flex flex-col">

@@ -6,7 +6,7 @@ from typing import Optional
 class Project(Base):
     __tablename__ = "projects"
 
-    id: Mapped[int] = mapped_column(primary_key=True, index=True)
+    id: Mapped[int] = mapped_column(primary_key=True, index=True, autoincrement=True)
     object_id: Mapped[int] = mapped_column(ForeignKey("construction_objects.id", ondelete="CASCADE"))
     name: Mapped[str] = mapped_column(String(255), nullable=False)  # Например: "Проект объекта X"
     
@@ -15,7 +15,7 @@ class Project(Base):
 class ProjectSection(Base):
     __tablename__ = "project_sections"
 
-    id: Mapped[int] = mapped_column(primary_key=True, index=True)
+    id: Mapped[int] = mapped_column(primary_key=True, index=True, autoincrement=True)
     project_id: Mapped[int] = mapped_column(ForeignKey("projects.id", ondelete="CASCADE"))
     section_code: Mapped[str] = mapped_column(String(100))        # Шифр
     section_name: Mapped[str] = mapped_column(String(255))        # Конструкции металлические

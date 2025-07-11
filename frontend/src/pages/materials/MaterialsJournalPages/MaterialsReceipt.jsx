@@ -375,7 +375,7 @@ export default function MaterialsReceipt() {
                 new Date(doc.issue_date).toLocaleDateString(),
                 new Date(doc.expiry_date).toLocaleDateString(),
                 <a
-                  href={`${import.meta.env.VITE_REACT_APP_API_URL}${doc.file_url}`}
+                  href={`${import.meta.env.VITE_REACT_APP_API_URL}/deliveries/quality-documents/view/${doc.id}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="underline text-blue-600"

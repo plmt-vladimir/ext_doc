@@ -23,8 +23,6 @@ export default function AOSRMaterialsTab() {
         const params = {
           site_id: common.construction,
         };
-        if (common.object) params.object_id = common.object;
-        if (common.section) params.zone_id = common.section;
 
         const res = await api.get("/deliveries/available", { params });
 
@@ -37,6 +35,8 @@ export default function AOSRMaterialsTab() {
             availableQty: item.quantity,
             deliveredMaterialId: item.id,
             deliveryId: item.delivery.id,
+            objectId: item.delivery.object_id,    
+            zoneId: item.delivery.zone_id,
             certificates: item.quality_documents.map(doc => ({
               id: doc.id,
               number: doc.number,
@@ -44,6 +44,7 @@ export default function AOSRMaterialsTab() {
               issue_date: doc.issue_date,
               expiry_date: doc.expiry_date,
               file_url: doc.file_url,
+              view_url: `${import.meta.env.VITE_REACT_APP_API_URL}/deliveries/quality-documents/view/${doc.id}`,
             })),
           }))
         );
@@ -133,6 +134,8 @@ export default function AOSRMaterialsTab() {
         <FilterableTable
           loading={loading}
           columns={[
+            { header: "Объект", accessor: "objectId", filterType: null, render: (_, row) => row.objectId || "—" },
+            { header: "Участок", accessor: "zoneId", filterType: null, render: (_, row) => row.zoneId || "—" },
             { header: "Наименование", accessor: "name", filterType: "text" },
             { header: "Тип", accessor: "type", filterType: "text" },
             { header: "Ед.", accessor: "unit", filterType: null },
@@ -147,7 +150,7 @@ export default function AOSRMaterialsTab() {
                       {row.certificates.map(doc => (
                         <li key={doc.id}>
                           <a
-                            href={`${import.meta.env.VITE_REACT_APP_API_URL}${doc.file_url}`}
+                            href={doc.view_url}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="underline text-blue-700 hover:text-blue-900 font-medium"

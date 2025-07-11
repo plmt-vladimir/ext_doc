@@ -91,7 +91,12 @@ export default function MaterialsJournalList() {
             header: "Накладная", accessor: "invoiceNumber", filterType: "text",
             render: (_, row) => (
               row.invoiceFileUrl ? (
-                <a href={`${import.meta.env.VITE_REACT_APP_API_URL}${row.invoiceFileUrl}`} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+                <a
+                  href={`${import.meta.env.VITE_REACT_APP_API_URL}/deliveries/invoices/view/${row.id}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-600 hover:underline"
+                >
                   {row.invoiceNumber}
                 </a>
               ) : row.invoiceNumber

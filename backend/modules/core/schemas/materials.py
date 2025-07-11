@@ -19,8 +19,7 @@ class DeliveryOut(BaseModel):
     object_id: Optional[int]
     zone_id: Optional[int]
 
-    class Config:
-        orm_mode = True
+    model_config = {"from_attributes": True} 
 
 class MaterialReferenceOut(BaseModel):
     id: int
@@ -28,8 +27,7 @@ class MaterialReferenceOut(BaseModel):
     type: str
     unit: str
 
-    class Config:
-        orm_mode = True
+    model_config = {"from_attributes": True} 
         
 class QualityDocumentOut(BaseModel):
     id: int
@@ -40,8 +38,8 @@ class QualityDocumentOut(BaseModel):
     file_url: str
     materials: Optional[List[str]] = []
 
-    class Config:
-        orm_mode = True
+    model_config = {"from_attributes": True} 
+
 class MaterialReferenceIn(BaseModel):
     name: str
     type: str
@@ -59,8 +57,7 @@ class DeliveredMaterialOut(BaseModel):
     delivery: DeliveryOut
     quality_documents: List[QualityDocumentOut]   
 
-    class Config:
-        orm_mode = True
+    model_config = {"from_attributes": True} 
 
 class DeliveryCreate(BaseModel):
     supplier: str

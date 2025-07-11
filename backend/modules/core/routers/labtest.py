@@ -2,30 +2,38 @@ from fastapi import APIRouter, UploadFile, File, Depends, HTTPException, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from pathlib import Path
-from uuid import uuid4
 
 from modules.core.models.igs_labtest import LabTest
 from modules.core.schemas.labtest import LabTestSchema, LabTestOut
 from common.database import get_async_session
+from common.minio_client import upload_file_to_minio, delete_file_from_minio, get_presigned_url
+from fastapi.responses import RedirectResponse
 
 router = APIRouter(prefix="/labtests", tags=["LabTests"])
 
-# Папка для хранения файлов лабораторных испытаний 
-UPLOAD_DIR = Path("data/labtests")
+
+# Открытие файла через пресайнд
+@router.get("/files/{object_path:path}")
+async def get_file(object_path: str):
+    url = get_presigned_url(object_path)
+    return RedirectResponse(url)
+
 
 # Загрузка PDF-файла
 @router.post("/upload")
 async def upload_labtest_file(file: UploadFile = File(...)):
-    ext = file.filename.split('.')[-1]
-    unique_name = f"{uuid4()}.{ext}"
-    file_path = UPLOAD_DIR / unique_name
+    ext = Path(file.filename or "").suffix.lower().lstrip(".")
+    if ext != "pdf":
+        raise HTTPException(status_code=400, detail="Только PDF разрешены")
 
-    with open(file_path, "wb") as f:
-        f.write(await file.read())
+    file_bytes = await file.read()
+    filename = file.filename or "labtest.pdf"
+    object_name = upload_file_to_minio(file_bytes, filename, folder="labtests")
 
-    return {"file_url": f"/files/labtests/{unique_name}"}
+    return {"file_url": object_name}
 
-# Создание 
+
+# Создание
 @router.post("/")
 async def create_labtest(
     data: LabTestSchema,
@@ -37,7 +45,8 @@ async def create_labtest(
     await session.refresh(labtest)
     return {"id": labtest.id}
 
-#Получение списка
+
+# Получение списка
 @router.get("/", response_model=list[LabTestOut])
 async def get_labtests(
     site_id: int = Query(...),
@@ -55,7 +64,8 @@ async def get_labtests(
     result = await session.execute(stmt)
     return result.scalars().all()
 
-# Обновление 
+
+# Обновление
 @router.put("/{labtest_id}")
 async def update_labtest(
     labtest_id: int,
@@ -69,12 +79,7 @@ async def update_labtest(
         raise HTTPException(status_code=404, detail="Лабораторное испытание не найдено")
 
     if labtest.file_url != data.file_url:
-        old_path = UPLOAD_DIR / Path(labtest.file_url).name
-        if old_path.exists():
-            try:
-                old_path.unlink()
-            except Exception as e:
-                raise HTTPException(status_code=500, detail=f"Не удалось удалить старый файл: {e}")
+        delete_file_from_minio(labtest.file_url)
 
     for field, value in data.dict().items():
         setattr(labtest, field, value)
@@ -83,7 +88,8 @@ async def update_labtest(
     await session.refresh(labtest)
     return {"detail": "Обновлено"}
 
-# Удаление 
+
+# Удаление
 @router.delete("/{labtest_id}")
 async def delete_labtest(
     labtest_id: int,
@@ -95,15 +101,12 @@ async def delete_labtest(
     if not labtest:
         raise HTTPException(status_code=404, detail="Лабораторное испытание не найдено")
 
-    file_path = UPLOAD_DIR / Path(labtest.file_url).name
-    if file_path.exists():
-        try:
-            file_path.unlink()
-        except Exception as e:
-            raise HTTPException(status_code=500, detail=f"Не удалось удалить файл: {e}")
+    if labtest.file_url:
+        delete_file_from_minio(labtest.file_url)
 
     await session.delete(labtest)
     await session.commit()
     return {"detail": "Удалено"}
+
 
 
